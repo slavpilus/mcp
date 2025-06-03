@@ -55,7 +55,7 @@ The system uses a Strategy Pattern to abstract different e-commerce platforms:
    cd mcp
    ```
 
-2. **Run the setup script**
+2. **Run the setup script (macOS/Linux)**
 
    ```bash
    chmod +x scripts/setup_dev.sh
@@ -67,16 +67,16 @@ The system uses a Strategy Pattern to abstract different e-commerce platforms:
    ```bash
    # Create virtual environment
    python -m venv venv
-   
+
    # Activate virtual environment
    # On macOS/Linux:
    source venv/bin/activate
    # On Windows:
    venv\Scripts\activate
-   
+
    # Install dependencies
    pip install -r requirements-dev.txt
-   
+
    # Install pre-commit hooks
    pre-commit install
    ```
@@ -134,10 +134,10 @@ mcp/
    # Format code
    black .
    isort .
-   
+
    # Run linter
    ruff check .
-   
+
    # Type checking
    mypy mcp_server ui
    ```
@@ -147,10 +147,10 @@ mcp/
    ```bash
    # Run all tests with coverage
    pytest
-   
+
    # Run specific test file
    pytest tests/unit/test_strategies.py
-   
+
    # Run with verbose output
    pytest -v
    ```
@@ -188,7 +188,7 @@ All code must pass these checks before merging.
 
    ```python
    from .base import EcommerceStrategy
-   
+
    class YourPlatformStrategy(EcommerceStrategy):
        async def get_order(self, order_id: str) -> Optional[Order]:
            # Implementation here
@@ -293,7 +293,7 @@ for details.
 ## 📞 Support
 
 For issues and feature requests, please use the
-[GitHub Issues](https://github.com/YOUR_USERNAME/ecommerce-support-mcp/issues) page.
+[GitHub Issues](https://github.com/slavpilus/mcp/issues) page.
 
 ---
 
