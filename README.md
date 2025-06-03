@@ -1,3 +1,15 @@
+---
+title: E-commerce Support MCP
+emoji: 🛍️
+colorFrom: blue
+colorTo: purple
+sdk: gradio
+sdk_version: 4.19.0
+app_file: app.py
+pinned: false
+license: mit
+---
+
 # 🛍️ MCP - Meta Commerce Platform - Universal E-commerce Customer Support Assistant
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
