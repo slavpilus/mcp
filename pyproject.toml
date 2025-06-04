@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mcp"
 version = "0.1.0"
-description = "Meta Commerce Platform. AI-powered e-commerce assistant."
+description = "MCP for Commerce Platforms. Platform-agnostic AI-powered e-commerce assistant."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}

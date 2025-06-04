@@ -1,5 +1,5 @@
 ---
-title: E-commerce Support MCP
+title: E-commerce Customer Support MCP
 emoji: 🛍️
 colorFrom: blue
 colorTo: purple
@@ -8,16 +8,17 @@ sdk_version: 4.19.0
 app_file: app.py
 pinned: false
 license: mit
+tags: ["mcp", "commerce", "customer support" ]
 ---
 
-# 🛍️ MCP - Meta Commerce Platform - Universal E-commerce Customer Support Assistant
+# 🛍️ MCP - MCP for Commerce Platforms - Universal E-commerce Customer Support Assistant
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 **One Chat, Every Platform** - A platform-agnostic customer support assistant that
-connects to any e-commerce system through pluggable strategies, using MCP (Model
+connects to any e-commerce platform through pluggable strategies, using MCP (Model
 Context Protocol) server and Gradio for the interface.
 
 ## 🎯 Features
@@ -246,7 +247,7 @@ To deploy manually to Hugging Face Spaces:
 
 ```bash
 # Add Hugging Face remote
-git remote add space https://huggingface.co/spaces/YOUR_USERNAME/YOUR_SPACE_NAME
+git remote add space https://huggingface.co/spaces/SlavPilus/mpc-for-commerce-platforms
 
 # Push to deploy
 git push space main
