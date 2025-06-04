@@ -16,6 +16,7 @@ tags: ["mcp", "commerce", "customer support" ]
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![codecov](https://codecov.io/gh/slavpilus/mcp/graph/badge.svg?token=9N4MG2I9X2)](https://codecov.io/gh/slavpilus/mcp)
 
 **One Chat, Every Platform** - A platform-agnostic customer support assistant that
 connects to any e-commerce platform through pluggable strategies, using MCP (Model
