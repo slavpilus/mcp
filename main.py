@@ -6,6 +6,7 @@ and can be accessed by any MCP client via SSE transport.
 """
 
 import logging
+import os
 from pathlib import Path
 
 from starlette.requests import Request
@@ -129,4 +130,9 @@ def get_support_info(topic: str = "general", customer_id: str = "default") -> st
 
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    # Get port from environment (Hugging Face Spaces sets this)
+    port = int(os.getenv("PORT", "8000"))
+    host = os.getenv("HOST", "0.0.0.0")
+
+    logger.info(f"Starting Enneagora MCP Server on {host}:{port}")
+    mcp.run(transport="sse", host=host, port=port)
