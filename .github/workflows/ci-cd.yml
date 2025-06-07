@@ -153,7 +153,8 @@ jobs:
           EOF
 
           # Add and commit Hugging Face specific files
-          git add README.md requirements_hf.txt .env Dockerfile
+          git add README.md requirements_hf.txt Dockerfile
+          git add -f .env
           git commit -m "Deploy Enneagora MCP server to Hugging Face" || echo "No changes to commit"
 
           # Push to Hugging Face Space
