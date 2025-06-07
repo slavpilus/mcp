@@ -44,7 +44,7 @@ jobs:
         run: ruff check .
 
       - name: Type check with mypy
-        run: mypy mcp_server ui
+        run: mypy mcp_server main.py
 
   test:
     name: Run Tests
@@ -74,7 +74,7 @@ jobs:
 
       - name: Run tests with pytest
         run: |
-          pytest --cov=mcp_server --cov=ui --cov-report=term-missing --cov-report=xml
+          pytest --cov=mcp_server --cov=main --cov-report=term-missing --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@main
@@ -95,10 +95,69 @@ jobs:
           fetch-depth: 0
           lfs: true
 
+      - name: Create Hugging Face Space config
+        run: |
+          # Create space configuration for Hugging Face
+          cat > README.md << EOF
+          ---
+          title: Enneagora - E-commerce MCP Server
+          emoji: 🛒
+          colorFrom: blue
+          colorTo: purple
+          sdk: docker
+          pinned: false
+          suggested_hardware: cpu-basic
+          suggested_storage: small
+          ---
+
+          # Enneagora - E-commerce MCP Server
+
+          Enneagora - MCP-compliant server for e-commerce customer support.
+
+          ## MCP Endpoint
+
+          Connect to this MCP server at: \`https://your-space.hf.space/sse\`
+
+          ## Available Tools
+
+          - get_order_status
+          - cancel_order
+          - process_return
+          - track_package
+          - get_support_info
+          EOF
+
+      - name: Create Hugging Face requirements
+        run: |
+          # Copy requirements for Hugging Face
+          cp requirements.txt requirements_hf.txt
+
+          # Add Hugging Face specific dependencies if needed
+          echo "# Hugging Face deployment" >> requirements_hf.txt
+
       - name: Push to Hugging Face Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
+          # Configure git for Hugging Face
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
+          # Add Hugging Face remote
           git remote add space \
             https://${{ secrets.HF_USERNAME }}:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/${{ secrets.HF_USERNAME }}/${{ secrets.HF_SPACE_NAME }}
+
+          # Create environment file for Hugging Face
+          cat > .env << EOF
+          ENVIRONMENT=production
+          EOF
+
+          # Add and commit Hugging Face specific files
+          git add README.md requirements_hf.txt .env Dockerfile
+          git commit -m "Deploy Enneagora MCP server to Hugging Face" || echo "No changes to commit"
+
+          # Push to Hugging Face Space
           git push --force space main
+
+          echo "✅ Deployed to Hugging Face Space!"
+          echo "🌐 Visit: https://huggingface.co/spaces/${{ secrets.HF_USERNAME }}/${{ secrets.HF_SPACE_NAME }}"
