@@ -111,6 +111,7 @@ def test_tracking_info_model():
         tracking_number="TRK123456789",
         carrier="UPS",
         status="in_transit",
+        last_update=datetime.now(),
         estimated_delivery=datetime.now(),
         current_location="Chicago, IL",
         history=[

@@ -178,11 +178,15 @@ class MockDataStrategy(EcommerceStrategy):
         if not order or not order.tracking_number:
             return None
 
+        carrier = random.choice(["UPS", "FedEx", "USPS", "DHL"])
+
         return TrackingInfo(
             tracking_number=order.tracking_number,
-            carrier=random.choice(["UPS", "FedEx", "USPS", "DHL"]),
+            carrier=carrier,
             status=order.status,
+            last_update=datetime.now() - timedelta(hours=random.randint(1, 24)),
             estimated_delivery=order.created_at + timedelta(days=random.randint(3, 7)),
+            tracking_url=f"https://{carrier.lower()}.com/track/{order.tracking_number}",
             current_location=fake.city() + ", " + fake.state_abbr(),
             history=[
                 {

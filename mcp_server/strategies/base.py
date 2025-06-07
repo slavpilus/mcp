@@ -62,7 +62,9 @@ class TrackingInfo(BaseModel):
     tracking_number: str
     carrier: str
     status: str
+    last_update: datetime
     estimated_delivery: datetime | None = None
+    tracking_url: str | None = None
     current_location: str | None = None
     history: list[dict[str, Any]] = []
 
