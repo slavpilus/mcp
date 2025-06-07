@@ -1,314 +1,235 @@
----
-title: E-commerce Customer Support MCP
-emoji: 🛍️
-colorFrom: blue
-colorTo: purple
-sdk: gradio
-sdk_version: 5.33.0
-app_file: app.py
-pinned: false
-license: mit
-tags: ["mcp", "commerce", "customer support" ]
----
+# Enneagora - E-commerce MCP Server
 
-# 🛍️ MCP - MCP for Commerce Platforms - Universal E-commerce Customer Support Assistant
+Enneagora is a Model Context Protocol (MCP) server providing AI-powered customer support tools for e-commerce platforms. This server can be integrated with Claude Desktop or any MCP-compatible client to handle customer inquiries about orders, returns, shipping, and general support.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![codecov](https://codecov.io/gh/slavpilus/mcp/graph/badge.svg?token=9N4MG2I9X2)](https://codecov.io/gh/slavpilus/mcp)
+## 🚀 Features
 
-**One Chat, Every Platform** - A platform-agnostic customer support assistant that
-connects to any e-commerce platform through pluggable strategies, using MCP (Model
-Context Protocol) server and Gradio for the interface.
+- **MCP-Compliant**: True MCP server implementation using FastMCP with SSE transport
+- **5 Customer Support Tools**:
+  - `get_order_status` - Check order status and details
+  - `cancel_order` - Process order cancellations
+  - `process_return` - Handle return requests
+  - `track_package` - Track shipment status
+  - `get_support_info` - Provide general support information
+- **Platform Agnostic**: Strategy pattern for easy integration with any e-commerce platform
+- **Production Ready**: CI/CD pipeline with automated deployment to Hugging Face Spaces
 
-## 🎯 Features
+## 📋 Prerequisites
 
-- 📦 **Order Management**: Track orders, check status, view history
-- 🔄 **Returns & Refunds**: Initiate returns, process refunds seamlessly
-- ❌ **Cancellations**: Quick and easy order cancellations
-- 💬 **Natural Language**: Conversational interface for customer support
-- 🔌 **Platform Agnostic**: Extensible to any e-commerce platform
-- 🚀 **Auto-Deploy**: Continuous deployment to Hugging Face Spaces
+- Python 3.10 or higher
+- pip package manager
+- (Optional) Hugging Face account for deployment
+
+## 🛠️ Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/enneagora.git
+cd enneagora
+```
+
+2. Create and activate a virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+
+## 🚀 Running the Server
+
+### Local Development
+
+Run the MCP server locally:
+
+```bash
+python main.py
+```
+
+The server will start on `http://localhost:8000` with the MCP endpoint at `http://localhost:8000/sse`.
+
+### Using with Claude Desktop
+
+1. Add the server to your Claude Desktop configuration:
+
+```json
+{
+  "mcpServers": {
+    "ecommerce": {
+      "url": "http://localhost:8000/sse"
+    }
+  }
+}
+```
+
+2. For a deployed server on Hugging Face Spaces:
+
+```json
+{
+  "mcpServers": {
+    "ecommerce": {
+      "url": "https://SlavPilus.hf.space/enneagora/sse"
+    }
+  }
+}
+```
+
+3. Restart Claude Desktop to load the MCP tools.
+
+## 🧪 Testing the Tools
+
+Once connected to Claude Desktop, you can use natural language to interact with the tools:
+
+- "Check the status of order ORD-1001"
+- "Cancel order ORD-1004"
+- "I want to return my order ORD-1002"
+- "Track my package"
+- "What's your return policy?"
 
 ## 🏗️ Architecture
 
-The system uses a Strategy Pattern to abstract different e-commerce platforms:
-
 ```ascii
-┌─────────────────────────────────────────────────────────┐
-│                    Gradio UI Layer                      │
-│        (Customer Support Conversational Interface)      │
-└─────────────────────────────┬───────────────────────────┘
-                              │
-┌─────────────────────────────▼───────────────────────────┐
-│                    MCP Server Core                      │
-│  (Order Management, NLP Processing, Context Engine)     │
-└─────────────────────────────┬───────────────────────────┘
-                              │
-┌─────────────────────────────▼───────────────────────────┐
-│              E-commerce Strategy Interface              │
-│   (MockData, Shopify, Magento, WooCommerce, etc.)       │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│         MCP Clients                 │
+│  (Claude Desktop, Other Clients)    │
+└──────────────┬──────────────────────┘
+               │ SSE Transport
+┌──────────────▼──────────────────────┐
+│      FastMCP Server (main.py)       │
+├─────────────────────────────────────┤
+│  5 MCP Tools:                       │
+│  • get_order_status(order_id)       │
+│  • cancel_order(order_id, reason)   │
+│  • process_return(order_id, items)  │
+│  • track_package(order_id)          │
+│  • get_support_info(topic)          │
+├─────────────────────────────────────┤
+│   E-commerce Strategy Layer         │
+│  • Mock Strategy (Demo)             │
+│  • Shopify Strategy (Future)        │
+│  • Magento Strategy (Future)        │
+└─────────────────────────────────────┘
 ```
 
-## 🚀 Quick Start
+## 🔧 Configuration
 
-### Prerequisites
+### Environment Variables
 
-- Python 3.10 or higher
-- Git
-- Virtual environment tool (venv)
+Currently, the server uses a mock data strategy for demonstration. In production, you would configure:
 
-### Installation
+- `ECOMMERCE_PLATFORM`: E-commerce platform to use (e.g., "shopify", "magento")
+- Platform-specific credentials (API keys, endpoints, etc.)
 
-1. **Clone the repository**
+### Adding New E-commerce Platforms
 
-   ```bash
-   git clone https://github.com/slavpilus/mcp.git
-   cd mcp
-   ```
+1. Create a new strategy in `mcp_server/strategies/`:
 
-2. **Run the setup script (macOS/Linux)**
+```python
+from .base import BaseEcommerceStrategy
 
-   ```bash
-   chmod +x scripts/setup_dev.sh
-   ./scripts/setup_dev.sh
-   ```
+class ShopifyStrategy(BaseEcommerceStrategy):
+    def get_order_status(self, order_id: str) -> dict:
+        # Implement Shopify API integration
+        pass
+```
 
-   Or manually:
+2. Register the strategy in `mcp_server/strategies/__init__.py`
 
-   ```bash
-   # Create virtual environment
-   python -m venv venv
+3. Configure the strategy in your environment
 
-   # Activate virtual environment
-   # On macOS/Linux:
-   source venv/bin/activate
-   # On Windows:
-   venv\Scripts\activate
+## 🚢 Deployment
 
-   # Install dependencies
-   pip install -r requirements-dev.txt
+### Deploy to Hugging Face Spaces
 
-   # Install pre-commit hooks
-   pre-commit install
-   ```
+1. Fork this repository
+2. Set up GitHub secrets:
+   - `HF_TOKEN`: Your Hugging Face token
+   - `HF_USERNAME`: Your Hugging Face username
+   - `HF_SPACE_NAME`: Name for your Space
+3. Push to main branch to trigger deployment
 
-3. **Configure environment variables**
+### Manual Deployment
 
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+```bash
+# Build Docker image
+docker build -t enneagora
 
-4. **Run the application**
+# Run container
+docker run -p 8000:8000 enneagora
+```
 
-   ```bash
-   python app.py
-   ```
+## 🧪 Development
 
-   The application will be available at `http://localhost:7860`
+### Running Tests
 
-## 🛠️ Development
+```bash
+# Install dev dependencies
+pip install -r requirements-dev.txt
+
+# Run tests with coverage
+pytest --cov=enneagora --cov=main
+
+# Run linting and formatting
+black .
+isort .
+ruff check .
+mypy enneagora main.py
+```
 
 ### Project Structure
 
 ```text
-mcp/
-├── .github/workflows/    # CI/CD pipelines
-├── mcp_server/          # Core MCP server implementation
-│   ├── strategies/      # E-commerce platform strategies
-│   ├── models/          # Data models
-│   └── utils/           # Utility functions
-├── ui/                  # Gradio UI components
-├── tests/               # Test suite
-├── app.py               # Main Gradio application
-└── requirements.txt     # Python dependencies
+enneagora/
+├── main.py                 # FastMCP server entry point
+├── mcp_server/            # Core server implementation
+│   ├── server.py          # Main server logic
+│   ├── nlp_processor.py   # NLP processing layer
+│   ├── models/            # Data models
+│   └── strategies/        # E-commerce platform strategies
+├── tests/                 # Test suite
+├── scripts/               # Utility scripts
+└── requirements.txt       # Python dependencies
 ```
 
-### Development Workflow
+## 📝 License
 
-1. **Activate virtual environment**
-
-   ```bash
-   source venv/bin/activate  # macOS/Linux
-   # or
-   venv\Scripts\activate     # Windows
-   ```
-
-2. **Make your changes**
-   - Follow the existing code style
-   - Add tests for new functionality
-   - Update documentation as needed
-
-3. **Run code quality checks**
-
-   ```bash
-   # Format code
-   black .
-   isort .
-
-   # Run linter
-   ruff check .
-
-   # Type checking
-   mypy mcp_server ui
-   ```
-
-4. **Run tests**
-
-   ```bash
-   # Run all tests with coverage
-   pytest
-
-   # Run specific test file
-   pytest tests/unit/test_strategies.py
-
-   # Run with verbose output
-   pytest -v
-   ```
-
-5. **Commit changes**
-
-   ```bash
-   git add .
-   git commit -m "feat: your feature description"
-   ```
-
-   Pre-commit hooks will automatically run code quality checks.
-
-### Code Style
-
-This project uses:
-
-- **Black** for code formatting (line length: 88)
-- **isort** for import sorting
-- **Ruff** for linting
-- **MyPy** for type checking
-
-All code must pass these checks before merging.
-
-### Testing
-
-- Minimum test coverage: 80%
-- Write unit tests for all new functionality
-- Integration tests for critical workflows
-- Use pytest fixtures for test data
-
-### Adding a New E-commerce Platform
-
-1. Create a new strategy in `mcp_server/strategies/`:
-
-   ```python
-   from .base import EcommerceStrategy
-
-   class YourPlatformStrategy(EcommerceStrategy):
-       async def get_order(self, order_id: str) -> Optional[Order]:
-           # Implementation here
-           pass
-   ```
-
-2. Add tests in `tests/unit/test_your_platform_strategy.py`
-
-3. Update the strategy factory to include your platform
-
-## 📊 Environment Variables
-
-Create a `.env` file based on `.env.example`:
-
-```env
-# Application Settings
-DEBUG=False
-LOG_LEVEL=INFO
-
-# Hugging Face (for deployment)
-HF_TOKEN=your_token_here
-HF_USERNAME=your_username
-HF_SPACE_NAME=your_space_name
-
-# E-commerce Platforms (future)
-# SHOPIFY_API_KEY=
-# MAGENTO_API_URL=
-```
-
-## 🚀 Deployment
-
-### Automatic Deployment
-
-This project is configured for automatic deployment to Hugging Face Spaces:
-
-1. Push to the `main` branch
-2. GitHub Actions will run tests and quality checks
-3. If all checks pass, the app deploys to Hugging Face Spaces
-
-### Manual Deployment
-
-To deploy manually to Hugging Face Spaces:
-
-```bash
-# Add Hugging Face remote
-git remote add space https://huggingface.co/spaces/SlavPilus/mpc-for-commerce-platforms
-
-# Push to deploy
-git push space main
-```
-
-## 🧪 Running Specific Commands
-
-```bash
-# Run only unit tests
-pytest tests/unit/
-
-# Run with coverage report
-pytest --cov=mcp_server --cov=ui --cov-report=html
-
-# Run linting
-ruff check . --fix
-
-# Format imports
-isort .
-
-# Type checking
-mypy mcp_server ui --strict
-```
+MIT License - see LICENSE file for details.
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-### Commit Convention
+## 🐛 Troubleshooting
 
-We use conventional commits:
+### Common Issues
 
-- `feat:` New features
-- `fix:` Bug fixes
-- `docs:` Documentation changes
-- `style:` Code style changes
-- `refactor:` Code refactoring
-- `test:` Test additions/changes
-- `chore:` Maintenance tasks
+1. **Claude Desktop doesn't see the tools**
+   - Verify the server is running and accessible
+   - Check the MCP endpoint URL in Claude Desktop config
+   - Restart Claude Desktop after configuration changes
 
-## 📝 License
+2. **Server connection issues**
+   - Ensure the server is running on the correct port
+   - Check firewall settings for local development
+   - Verify the SSE endpoint is accessible
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
-for details.
+## 📚 Resources
 
-## 🙏 Acknowledgments
+- [MCP Documentation](https://modelcontextprotocol.io/)
+- [FastMCP Documentation](https://github.com/jlowin/fastmcp)
+- [Hugging Face Spaces](https://huggingface.co/spaces)
 
-- Built with [Gradio](https://gradio.app/)
-- Uses [MCP (Model Context Protocol)](https://github.com/modelcontextprotocol)
-- Deployed on [Hugging Face Spaces](https://huggingface.co/spaces)
+## 🏆 Acknowledgments
 
-## 📞 Support
-
-For issues and feature requests, please use the
-[GitHub Issues](https://github.com/slavpilus/mcp/issues) page.
-
----
-
-**Status**: 🚧 Under active development - Phase 1: Core Foundation
+Enneagora was built for the MCP Hackathon, demonstrating the power of Model Context Protocol for creating AI-powered customer support systems.

@@ -196,3 +196,7 @@ cython_debug/
 # Gradio
 gradio_cached_examples/
 flagged/
+
+# OS specific files
+.DS_Store
+Thumbs.db
