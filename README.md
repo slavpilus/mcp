@@ -25,7 +25,7 @@ Enneagora is a Model Context Protocol (MCP) server providing AI-powered customer
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/enneagora.git
+git clone https://github.com/slavpilus/enneagora.git
 cd enneagora
 ```
 
@@ -232,4 +232,4 @@ MIT License - see LICENSE file for details.
 
 ## 🏆 Acknowledgments
 
-Enneagora was built for the MCP Hackathon, demonstrating the power of Model Context Protocol for creating AI-powered customer support systems.
+Enneagora was built for the Hugging Face MCP Hackathon, demonstrating the power of Model Context Protocol for creating AI-powered customer support systems.
