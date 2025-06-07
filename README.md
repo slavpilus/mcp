@@ -1,3 +1,16 @@
+---
+title: Enneagora - E-commerce MCP Server
+emoji: 🛍️
+colorFrom: blue
+colorTo: purple
+sdk: gradio
+sdk_version: 5.33.0
+app_file: app.py
+pinned: false
+license: mit
+tags: ["mcp", "commerce", "customer support" ]
+---
+
 # Enneagora - E-commerce MCP Server
 
 Enneagora is a Model Context Protocol (MCP) server providing AI-powered customer support tools for e-commerce platforms. This server can be integrated with Claude Desktop or any MCP-compatible client to handle customer inquiries about orders, returns, shipping, and general support.
