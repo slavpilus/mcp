@@ -13,7 +13,12 @@ COPY . .
 RUN mkdir -p static
 
 # Expose the port for the MCP server
+# Note: Hugging Face Spaces will set the PORT environment variable
 EXPOSE 8000
+
+# Set default environment variables (can be overridden)
+ENV UVICORN_HOST=0.0.0.0
+ENV UVICORN_PORT=8000
 
 # Run the FastMCP server
 CMD ["python", "main.py"]

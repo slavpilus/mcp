@@ -6,6 +6,7 @@ and can be accessed by any MCP client via SSE transport.
 """
 
 import logging
+import os
 from pathlib import Path
 
 from starlette.requests import Request
@@ -129,4 +130,10 @@ def get_support_info(topic: str = "general", customer_id: str = "default") -> st
 
 
 if __name__ == "__main__":
+    # Set environment variables for uvicorn (used by FastMCP internally)
+    port = os.getenv("PORT", "8000")
+    os.environ["UVICORN_PORT"] = port
+    os.environ["UVICORN_HOST"] = "0.0.0.0"
+
+    logger.info(f"Starting Enneagora MCP Server on port {port}")
     mcp.run(transport="sse")
