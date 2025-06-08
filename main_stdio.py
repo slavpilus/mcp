@@ -8,7 +8,7 @@ and can be accessed via stdio transport for Claude Desktop.
 import logging
 
 from mcp.server import FastMCP
-from mcp_server.server import EcommerceMCPServer
+from mcp_server.mcp_tools import register_tools
 
 # Configure logging to stderr so it doesn't interfere with stdio
 logging.basicConfig(
@@ -18,98 +18,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Initialize the e-commerce MCP server
-ecommerce_server = EcommerceMCPServer()
-
 # Create FastMCP server instance
 mcp = FastMCP("Enneagora - E-commerce MCP Server")
 
-
-@mcp.tool()
-async def get_order_status(order_id: str, customer_id: str = "default") -> str:
-    """
-    Get status for a specific order.
-
-    Args:
-        order_id: The order identifier (e.g., "ORD-1001")
-        customer_id: Customer identifier for validation (default: "default")
-
-    Returns:
-        Formatted order status information including tracking details if shipped
-    """
-    return await ecommerce_server.get_order_status(order_id, customer_id)
-
-
-@mcp.tool()
-async def cancel_order(
-    order_id: str, reason: str = "Customer requested", customer_id: str = "default"
-) -> str:
-    """
-    Cancel an order.
-
-    Args:
-        order_id: The order identifier to cancel (e.g., "ORD-1001")
-        reason: Reason for cancellation (default: "Customer requested")
-        customer_id: Customer identifier for validation (default: "default")
-
-    Returns:
-        Cancellation confirmation or error message
-    """
-    return await ecommerce_server.cancel_order(order_id, reason, customer_id)
-
-
-@mcp.tool()
-async def process_return(
-    order_id: str,
-    item_ids: list[str] | None = None,
-    reason: str = "Customer return",
-    customer_id: str = "default",
-) -> str:
-    """
-    Process a return request for an order.
-
-    Args:
-        order_id: The order identifier to return (e.g., "ORD-1001")
-        item_ids: List of specific item IDs to return (None = all items)
-        reason: Reason for return (default: "Customer return")
-        customer_id: Customer identifier for validation (default: "default")
-
-    Returns:
-        Return instructions and confirmation with return ID
-    """
-    return await ecommerce_server.process_return(
-        order_id, item_ids, reason, customer_id
-    )
-
-
-@mcp.tool()
-async def track_package(order_id: str, customer_id: str = "default") -> str:
-    """
-    Track package delivery status for an order.
-
-    Args:
-        order_id: The order identifier to track (e.g., "ORD-1001")
-        customer_id: Customer identifier for validation (default: "default")
-
-    Returns:
-        Detailed tracking information including carrier, status, and delivery estimate
-    """
-    return await ecommerce_server.track_package(order_id, "order", customer_id)
-
-
-@mcp.tool()
-async def get_support_info(topic: str = "general", customer_id: str = "default") -> str:
-    """
-    Get customer support information for a specific topic.
-
-    Args:
-        topic: Support topic - "returns", "shipping", "contact", or "general" (default: "general")
-        customer_id: Customer identifier (default: "default")
-
-    Returns:
-        Relevant support information based on the topic
-    """
-    return await ecommerce_server.get_support_info(topic, customer_id)
+# Register all e-commerce tools
+tools = register_tools(mcp)
 
 
 if __name__ == "__main__":
