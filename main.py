@@ -139,4 +139,11 @@ if __name__ == "__main__":
 
     logger.info(f"Starting Enneagora MCP Server on 0.0.0.0:{port}")
     logger.info(f"PORT env var: {os.getenv('PORT', 'not set')}")
-    mcp.run(transport="sse")
+
+    # Log available routes
+    logger.info("Available routes:")
+    logger.info(f"  - SSE endpoint: {mcp.settings.sse_path}")
+    logger.info(f"  - Mount path: {mcp.settings.mount_path}")
+
+    # Run with explicit mount path
+    mcp.run(transport="sse", mount_path="/sse")
