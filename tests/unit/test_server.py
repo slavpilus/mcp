@@ -32,8 +32,8 @@ async def test_get_order_status():
     assert "Order Date:" in response
     assert "Total: $" in response
 
-    # Test with invalid order ID
-    response = await server.get_order_status("INVALID-ID")
+    # Test with error pattern order ID
+    response = await server.get_order_status("ORD-ERROR")
     assert "not found" in response
 
 
@@ -47,8 +47,8 @@ async def test_cancel_order():
     # Response depends on order status in mock data
     assert "ORD-1004" in response
 
-    # Test with invalid order ID
-    response = await server.cancel_order("INVALID-ID")
+    # Test with error pattern order ID
+    response = await server.cancel_order("ORD-ERROR")
     assert "not found" in response
 
 
@@ -69,8 +69,8 @@ async def test_process_return():
         response = await server.process_return(delivered_order_id)
         assert "Return initiated" in response or "cannot be returned" in response
 
-    # Test with invalid order ID
-    response = await server.process_return("INVALID-ID")
+    # Test with error pattern order ID
+    response = await server.process_return("ORD-ERROR")
     assert "not found" in response
 
 
@@ -180,7 +180,7 @@ async def test_get_order_status_with_shipped_order():
         assert "Shipped" in response
         assert "Tracking Number: TRK123456789" in response
         assert "Carrier: UPS" in response
-        assert "Current Status: in_transit" in response
+        assert "Current Status: In Transit" in response
         assert "Estimated Delivery:" in response
 
 

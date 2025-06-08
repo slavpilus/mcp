@@ -105,9 +105,158 @@ class MockDataStrategy(EcommerceStrategy):
 
             self.orders[order_id] = order
 
+    def _parse_order_id(self, order_id: str) -> tuple[str, bool]:
+        """
+        Parse order ID to determine status and existence.
+
+        Returns:
+            tuple: (status, should_exist)
+        """
+        # Handle error/not found cases
+        if order_id.endswith("-E") or order_id.upper() == "ORD-ERROR":
+            return "error", False
+
+        # Map suffixes to statuses
+        status_map = {
+            "-D": "delivered",
+            "-C": "cancelled",
+            "-S": "shipped",
+            "-P": "processing",
+            "-F": "failed",
+            "-R": "ready_for_pickup",
+            "-T": "in_transit",
+        }
+
+        for suffix, status in status_map.items():
+            if order_id.endswith(suffix):
+                return status, True
+
+        # Default to pending for orders without suffix
+        return "pending", True
+
+    def _create_dynamic_order(self, order_id: str, status: str) -> Order:
+        """Create a dynamic order with specified status."""
+        import random
+        from datetime import datetime, timedelta
+
+        # Extract base number from order ID for deterministic data
+        base_num = "".join(filter(str.isdigit, order_id))
+
+        # Create a local Random instance to avoid affecting global state
+        local_random = random.Random()
+        if base_num:
+            local_random.seed(int(base_num))
+
+        # Create deterministic customer ID
+        customer_id = f"CUST-{local_random.randint(100, 999)}"
+
+        # Create order entries
+        num_entries = local_random.randint(1, 3)
+        entries = []
+        total = 0.0
+
+        products = [
+            ("Wireless Headphones", 99.99),
+            ("Smartphone Case", 24.99),
+            ("USB Cable", 12.99),
+            ("Bluetooth Speaker", 79.99),
+            ("Phone Charger", 19.99),
+            ("Screen Protector", 9.99),
+            ("Memory Card", 34.99),
+            ("Tablet Stand", 29.99),
+        ]
+
+        for i in range(num_entries):
+            _, price = local_random.choice(products)
+            quantity = local_random.randint(1, 2)
+            entry_total = price * quantity
+            total += entry_total
+
+            entries.append(
+                OrderEntry(
+                    entry_id=f"ENTRY-{order_id}-{i + 1}",
+                    product_id=f"PROD-{local_random.randint(1000, 9999)}",
+                    quantity=quantity,
+                    entry_amount=entry_total,
+                    status="active" if status not in ["cancelled"] else "cancelled",
+                )
+            )
+
+        # Create addresses
+        shipping_address = Address(
+            line_1=fake.street_address(),
+            line_2="",
+            line_3="",
+            town=fake.city(),
+            postcode=fake.zipcode(),
+            country="USA",
+            phone=fake.phone_number(),
+        )
+
+        # Set realistic dates based on status
+        now = datetime.now()
+        if status == "delivered":
+            created_at = now - timedelta(days=local_random.randint(7, 30))
+            updated_at = now - timedelta(days=local_random.randint(1, 5))
+        elif status == "shipped":
+            created_at = now - timedelta(days=local_random.randint(3, 10))
+            updated_at = now - timedelta(days=local_random.randint(1, 3))
+        elif status == "cancelled":
+            created_at = now - timedelta(days=local_random.randint(1, 14))
+            updated_at = now - timedelta(days=local_random.randint(0, 2))
+        else:
+            created_at = now - timedelta(days=local_random.randint(0, 7))
+            updated_at = created_at + timedelta(hours=local_random.randint(1, 48))
+
+        # Generate tracking number for shipped/delivered orders
+        tracking_number = None
+        if status in ["shipped", "delivered", "in_transit"]:
+            tracking_number = f"TRK{local_random.randint(100000000000, 999999999999)}"
+
+        order = Order(
+            order_id=order_id,
+            customer_id=customer_id,
+            status=status,
+            created_at=created_at,
+            updated_at=updated_at,
+            entries=entries,
+            total_amount=total,
+            shipping_address=shipping_address,
+            billing_address=shipping_address,  # Same as shipping for simplicity
+            tracking_number=tracking_number,
+        )
+
+        # Cache the dynamically created order
+        self.orders[order_id] = order
+        return order
+
     async def get_order(self, order_id: str) -> Order | None:
-        """Retrieve order details by order ID."""
-        return self.orders.get(order_id)
+        """
+        Retrieve order details by order ID.
+
+        Supports dynamic order creation based on order ID patterns:
+        - ORD-XXXX-D: Delivered order
+        - ORD-XXXX-C: Cancelled order
+        - ORD-XXXX-S: Shipped order
+        - ORD-XXXX-P: Processing order
+        - ORD-XXXX-E: Error/not found
+        - ORD-XXXX-F: Failed/problem order
+        - ORD-XXXX-R: Ready for pickup
+        - ORD-XXXX-T: In transit
+        - ORD-XXXX (no suffix): Random existing order or new pending order
+        """
+        # Check if order exists in static data
+        if order_id in self.orders:
+            return self.orders[order_id]
+
+        # Parse dynamic order ID pattern
+        order_status, should_exist = self._parse_order_id(order_id)
+
+        if not should_exist:
+            return None
+
+        # Create dynamic order based on pattern
+        return self._create_dynamic_order(order_id, order_status)
 
     async def get_customer_orders(
         self, customer_id: str, filters: dict[str, Any] | None = None
@@ -143,14 +292,32 @@ class MockDataStrategy(EcommerceStrategy):
         return False
 
     async def cancel_order(self, order_id: str, reason: str) -> bool:
-        """Cancel an order with a reason."""
-        if order_id in self.orders and self.orders[order_id].status in [
-            "pending",
-            "processing",
-        ]:
-            self.orders[order_id].status = "cancelled"
-            self.orders[order_id].updated_at = datetime.now()
+        """
+        Cancel an order with a reason.
+
+        Dynamic behavior based on order ID:
+        - ORD-XXXX-F: Always fails (simulates payment issues, etc.)
+        - ORD-XXXX-C: Already cancelled
+        - ORD-XXXX-D: Already delivered (cannot cancel)
+        - ORD-XXXX-S: Already shipped (cannot cancel)
+        """
+        # Get or create the order
+        order = await self.get_order(order_id)
+        if not order:
+            return False
+
+        # Handle special cases based on order ID
+        if order_id.endswith("-F"):
+            # Simulate cancellation failure
+            return False
+
+        # Check if order can be cancelled based on status
+        if order.status in ["pending", "processing"]:
+            order.status = "cancelled"
+            order.updated_at = datetime.now()
             return True
+
+        # Already cancelled, delivered, or shipped orders cannot be cancelled
         return False
 
     async def initiate_return(
@@ -173,17 +340,78 @@ class MockDataStrategy(EcommerceStrategy):
         return return_obj
 
     async def get_order_tracking(self, order_id: str) -> TrackingInfo | None:
-        """Get tracking information for an order."""
-        order = self.orders.get(order_id)
-        if not order or not order.tracking_number:
+        """
+        Get tracking information for an order.
+
+        Dynamic behavior based on order ID:
+        - ORD-XXXX-E: Returns None (tracking not found)
+        - ORD-XXXX-F: Returns tracking with "lost" status
+        - ORD-XXXX-D: Delivered with full tracking history
+        - ORD-XXXX-S: Shipped and in transit
+        - ORD-XXXX-T: In transit with live updates
+        """
+        order = await self.get_order(order_id)
+        if not order:
             return None
 
-        carrier = random.choice(["UPS", "FedEx", "USPS", "DHL"])
+        # Handle error cases
+        if order_id.endswith("-E"):
+            return None
+
+        # Ensure tracking number exists for trackable orders
+        if not order.tracking_number and order.status in [
+            "shipped",
+            "delivered",
+            "in_transit",
+            "failed",
+        ]:
+            order.tracking_number = f"TRK{random.randint(100000000000, 999999999999)}"
+
+        if not order.tracking_number:
+            return None
+
+        # Determine carrier based on order ID for consistency
+        carriers = ["UPS", "FedEx", "USPS", "DHL"]
+        carrier_index = sum(ord(c) for c in order_id) % len(carriers)
+        carrier = carriers[carrier_index]
+
+        # Handle failed/lost packages
+        if order_id.endswith("-F"):
+            return TrackingInfo(
+                tracking_number=order.tracking_number,
+                carrier=carrier,
+                status="lost",
+                last_update=datetime.now() - timedelta(days=random.randint(3, 7)),
+                estimated_delivery=None,
+                tracking_url=f"https://{carrier.lower()}.com/track/{order.tracking_number}",
+                current_location="Unknown",
+                history=[
+                    {
+                        "timestamp": order.created_at + timedelta(hours=12),
+                        "location": "Distribution Center",
+                        "status": "Package scanned",
+                    },
+                    {
+                        "timestamp": order.created_at + timedelta(days=2),
+                        "location": "In Transit",
+                        "status": "Package lost during transit",
+                    },
+                ],
+            )
+
+        # Normal tracking based on order status
+        tracking_status = order.status
+        if order.status == "in_transit":
+            tracking_status = "in_transit"
+        elif order.status == "delivered":
+            tracking_status = "delivered"
+        elif order.status == "shipped":
+            tracking_status = "out_for_delivery"
 
         return TrackingInfo(
             tracking_number=order.tracking_number,
             carrier=carrier,
-            status=order.status,
+            status=tracking_status,
             last_update=datetime.now() - timedelta(hours=random.randint(1, 24)),
             estimated_delivery=order.created_at + timedelta(days=random.randint(3, 7)),
             tracking_url=f"https://{carrier.lower()}.com/track/{order.tracking_number}",

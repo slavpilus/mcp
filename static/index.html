@@ -142,15 +142,71 @@
   }
 }</code></pre>
 
+        <h2>🧪 Dynamic Testing Data</h2>
+        <p>Enneagora features a dynamic mock data system where order behavior is determined by the order ID pattern. You can test various scenarios using these special order IDs:</p>
+
+        <div class="tool">
+            <h3>Order Status Patterns</h3>
+            <p>Use these order ID suffixes to test different order states:</p>
+            <ul>
+                <li><code>ORD-XXXX-D</code> - <strong>Delivered orders</strong> (e.g., ORD-1001-D)</li>
+                <li><code>ORD-XXXX-S</code> - <strong>Shipped orders</strong> with tracking (e.g., ORD-1002-S)</li>
+                <li><code>ORD-XXXX-T</code> - <strong>In Transit orders</strong> with location updates (e.g., ORD-1003-T)</li>
+                <li><code>ORD-XXXX-P</code> - <strong>Processing orders</strong> (e.g., ORD-1004-P)</li>
+                <li><code>ORD-XXXX-R</code> - <strong>Ready for Pickup</strong> (e.g., ORD-1005-R)</li>
+                <li><code>ORD-XXXX-C</code> - <strong>Cancelled orders</strong> (e.g., ORD-1006-C)</li>
+                <li><code>ORD-XXXX-F</code> - <strong>Failed/Problem orders</strong> (e.g., ORD-1007-F)</li>
+                <li><code>ORD-XXXX-E</code> - <strong>Error/Not Found</strong> (e.g., ORD-1008-E)</li>
+                <li><code>ORD-XXXX</code> - <strong>Pending orders</strong> (no suffix, e.g., ORD-1009)</li>
+            </ul>
+        </div>
+
+        <div class="tool">
+            <h3>Special Test Cases</h3>
+            <p>Try these specific scenarios:</p>
+            <ul>
+                <li><code>ORD-ERROR</code> - Always returns "not found"</li>
+                <li><code>ORD-1001-F</code> - Failed order with "lost package" tracking</li>
+                <li><code>ORD-2002-F</code> - Cannot be cancelled (simulates payment issues)</li>
+                <li><code>ORD-3003-D</code> - Delivered order with full tracking history</li>
+            </ul>
+        </div>
+
         <h2>📚 Example Usage</h2>
         <p>Once connected, you can ask Claude:</p>
         <ul>
-            <li>"Check the status of order ORD-1001"</li>
-            <li>"Cancel order ORD-1004"</li>
-            <li>"I want to return my order ORD-1002"</li>
-            <li>"Track order ORD-1003"</li>
+            <li>"Check the status of order ORD-1001-S" (Shipped order)</li>
+            <li>"Cancel order ORD-1004-P" (Processing order - should work)</li>
+            <li>"Cancel order ORD-1002-D" (Delivered order - should fail)</li>
+            <li>"Track order ORD-1003-T" (In transit with location)</li>
+            <li>"Check order ORD-1005-R" (Ready for pickup)</li>
+            <li>"What happened to order ORD-1007-F?" (Failed order)</li>
+            <li>"Find order ORD-1008-E" (Error case)</li>
             <li>"What's your return policy?"</li>
         </ul>
+
+        <h2>🎯 Testing Different Scenarios</h2>
+        <div class="tool">
+            <h3>Cancellation Testing</h3>
+            <ul>
+                <li>✅ <code>ORD-1001-P</code> - Can be cancelled (Processing)</li>
+                <li>✅ <code>ORD-1002</code> - Can be cancelled (Pending)</li>
+                <li>❌ <code>ORD-1003-D</code> - Cannot cancel (Delivered)</li>
+                <li>❌ <code>ORD-1004-S</code> - Cannot cancel (Shipped)</li>
+                <li>❌ <code>ORD-1005-F</code> - Cancellation fails (System error)</li>
+            </ul>
+        </div>
+
+        <div class="tool">
+            <h3>Tracking Testing</h3>
+            <ul>
+                <li>📦 <code>ORD-1001-S</code> - Shows "Out for Delivery"</li>
+                <li>🚚 <code>ORD-1002-T</code> - Shows current location and "In Transit"</li>
+                <li>✅ <code>ORD-1003-D</code> - Shows delivery confirmation</li>
+                <li>❌ <code>ORD-1004-F</code> - Shows "Package Lost" status</li>
+                <li>❓ <code>ORD-1005-E</code> - No tracking found</li>
+            </ul>
+        </div>
 
         <h2>📖 Documentation</h2>
         <p>For more information, visit the <a href="https://github.com/yourusername/enneagora">GitHub repository</a>.</p>

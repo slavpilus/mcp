@@ -35,18 +35,59 @@ class EcommerceMCPServer:
                 return f"Order {order_id} not found. Please check the order number and try again."
 
             # Format response
-            response = f"Order {order.order_id} Status: {order.status.title()}\n"
+            response = f"Order {order.order_id} Status: {order.status.replace('_', ' ').title()}\n"
             response += f"Order Date: {order.created_at.strftime('%B %d, %Y')}\n"
             response += f"Total: ${order.total_amount:.2f}\n"
 
+            # Add status-specific information
             if order.status == "shipped":
                 tracking = await self.ecommerce_strategy.get_order_tracking(order_id)
                 if tracking:
                     response += f"\nTracking Number: {tracking.tracking_number}\n"
                     response += f"Carrier: {tracking.carrier}\n"
-                    response += f"Current Status: {tracking.status}\n"
+                    response += (
+                        f"Current Status: {tracking.status.replace('_', ' ').title()}\n"
+                    )
                     if tracking.estimated_delivery:
-                        response += f"Estimated Delivery: {tracking.estimated_delivery.strftime('%B %d, %Y')}"
+                        response += f"Estimated Delivery: {tracking.estimated_delivery.strftime('%B %d, %Y')}\n"
+                    response += (
+                        "\nYour package has been shipped and is now with the carrier."
+                    )
+            elif order.status == "in_transit":
+                tracking = await self.ecommerce_strategy.get_order_tracking(order_id)
+                if tracking:
+                    response += f"\nTracking Number: {tracking.tracking_number}\n"
+                    response += f"Carrier: {tracking.carrier}\n"
+                    response += (
+                        f"Current Status: {tracking.status.replace('_', ' ').title()}\n"
+                    )
+                    if tracking.current_location:
+                        response += f"Current Location: {tracking.current_location}\n"
+                    if tracking.estimated_delivery:
+                        response += f"Estimated Delivery: {tracking.estimated_delivery.strftime('%B %d, %Y')}\n"
+                    response += (
+                        "\nYour package is actively moving through the carrier network."
+                    )
+            elif order.status == "delivered":
+                tracking = await self.ecommerce_strategy.get_order_tracking(order_id)
+                if tracking:
+                    response += f"\nTracking Number: {tracking.tracking_number}\n"
+                    response += f"Carrier: {tracking.carrier}\n"
+                    response += f"Delivered on: {tracking.last_update.strftime('%B %d, %Y at %I:%M %p')}\n"
+                    if tracking.current_location:
+                        response += f"Delivered to: {tracking.current_location}\n"
+                    response += "\nYour package has been successfully delivered!"
+            elif order.status == "ready_for_pickup":
+                response += "\nYour order is ready for pickup at our store location.\n"
+                response += "Please bring a valid ID and your order confirmation."
+            elif order.status == "cancelled":
+                response += "\nThis order has been cancelled.\n"
+                response += (
+                    "If you were charged, the refund will appear in 3-5 business days."
+                )
+            elif order.status == "failed":
+                response += "\nThere was an issue processing this order.\n"
+                response += "Please contact customer service for assistance."
 
             return response
 

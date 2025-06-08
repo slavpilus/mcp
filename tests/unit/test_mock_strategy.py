@@ -26,9 +26,15 @@ async def test_get_order():
     assert order.shipping_address is not None
     assert order.billing_address is not None
 
-    # Test non-existent order
-    order = await strategy.get_order("INVALID-ID")
+    # Test error pattern order (should return None)
+    order = await strategy.get_order("ORD-1234-E")
     assert order is None
+
+    # Test dynamic order creation (should create pending order)
+    order = await strategy.get_order("ORD-9999")
+    assert order is not None
+    assert order.order_id == "ORD-9999"
+    assert order.status == "pending"
 
 
 @pytest.mark.asyncio
@@ -64,8 +70,8 @@ async def test_update_order_status():
     order = await strategy.get_order(order_id)
     assert order.status == "shipped"
 
-    # Test invalid order
-    success = await strategy.update_order_status("INVALID-ID", "shipped")
+    # Test error pattern order (should fail)
+    success = await strategy.update_order_status("ORD-ERROR", "shipped")
     assert success is False
 
 
@@ -190,3 +196,94 @@ async def test_get_shipping_options():
     assert any(opt.option_id == "standard" for opt in options)
     assert any(opt.option_id == "express" for opt in options)
     assert any(opt.option_id == "overnight" for opt in options)
+
+
+@pytest.mark.asyncio
+async def test_dynamic_order_patterns():
+    """Test dynamic order ID patterns."""
+    strategy = MockDataStrategy()
+
+    # Test delivered order pattern
+    order = await strategy.get_order("ORD-2001-D")
+    assert order is not None
+    assert order.status == "delivered"
+    assert order.tracking_number is not None
+
+    # Test cancelled order pattern
+    order = await strategy.get_order("ORD-2002-C")
+    assert order is not None
+    assert order.status == "cancelled"
+
+    # Test shipped order pattern
+    order = await strategy.get_order("ORD-2003-S")
+    assert order is not None
+    assert order.status == "shipped"
+    assert order.tracking_number is not None
+
+    # Test processing order pattern
+    order = await strategy.get_order("ORD-2004-P")
+    assert order is not None
+    assert order.status == "processing"
+
+    # Test failed order pattern
+    order = await strategy.get_order("ORD-2005-F")
+    assert order is not None
+    assert order.status == "failed"
+
+    # Test ready for pickup pattern
+    order = await strategy.get_order("ORD-2006-R")
+    assert order is not None
+    assert order.status == "ready_for_pickup"
+
+    # Test in transit pattern
+    order = await strategy.get_order("ORD-2007-T")
+    assert order is not None
+    assert order.status == "in_transit"
+    assert order.tracking_number is not None
+
+
+@pytest.mark.asyncio
+async def test_dynamic_cancel_order_behaviors():
+    """Test dynamic cancellation behaviors."""
+    strategy = MockDataStrategy()
+
+    # Test cancelling a processing order (should succeed)
+    success = await strategy.cancel_order("ORD-3001-P", "Customer requested")
+    assert success is True
+
+    # Test cancelling a failed order (should fail)
+    success = await strategy.cancel_order("ORD-3002-F", "Customer requested")
+    assert success is False
+
+    # Test cancelling a delivered order (should fail)
+    success = await strategy.cancel_order("ORD-3003-D", "Customer requested")
+    assert success is False
+
+    # Test cancelling a shipped order (should fail)
+    success = await strategy.cancel_order("ORD-3004-S", "Customer requested")
+    assert success is False
+
+
+@pytest.mark.asyncio
+async def test_dynamic_tracking_behaviors():
+    """Test dynamic tracking behaviors."""
+    strategy = MockDataStrategy()
+
+    # Test tracking for error order (should return None)
+    tracking = await strategy.get_order_tracking("ORD-4001-E")
+    assert tracking is None
+
+    # Test tracking for failed order (should return "lost" status)
+    tracking = await strategy.get_order_tracking("ORD-4002-F")
+    assert tracking is not None
+    assert tracking.status == "lost"
+
+    # Test tracking for delivered order
+    tracking = await strategy.get_order_tracking("ORD-4003-D")
+    assert tracking is not None
+    assert tracking.status == "delivered"
+
+    # Test tracking for in transit order
+    tracking = await strategy.get_order_tracking("ORD-4004-T")
+    assert tracking is not None
+    assert tracking.status == "in_transit"
