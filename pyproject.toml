@@ -57,15 +57,19 @@ testpaths = ["tests"]
 addopts = [
     "--cov=mcp_server",
     "--cov=main",
+    "--cov=main_stdio",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
     "--cov-fail-under=80",
     "-v"
 ]
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')"
+]
 
 [tool.coverage.run]
-source = ["mcp_server", "main"]
+source = ["mcp_server", "main", "main_stdio"]
 omit = ["*/tests/*", "*/__init__.py"]
 
 [tool.coverage.report]

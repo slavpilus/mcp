@@ -58,43 +58,67 @@ pip install -r requirements.txt
 
 ## 🚀 Running the Server
 
-### Local Development
+### Local Development (SSE Transport)
 
-Run the MCP server locally:
+Run the MCP server locally with SSE transport (for web clients):
 
 ```bash
 python main.py
 ```
 
-The server will start on `http://localhost:8000` with the MCP endpoint at `http://localhost:8000/sse`.
+The server will start on `http://localhost:7860` with the MCP endpoint at `http://localhost:7860/sse`.
+
+### Local Development (STDIO Transport)
+
+Run the MCP server with stdio transport (for Claude Desktop):
+
+```bash
+python main_stdio.py
+```
+
+This version communicates via standard input/output for Claude Desktop compatibility.
 
 ### Using with Claude Desktop
 
-1. Add the server to your Claude Desktop configuration:
+Claude Desktop currently supports only local MCP servers via stdio transport. To use Enneagora with Claude Desktop:
+
+1. **Install dependencies** (if not already done):
+
+```bash
+cd /path/to/enneagora
+python -m venv venv
+./venv/bin/pip install -r requirements.txt  # On Windows: venv\Scripts\pip
+```
+
+2. **Configure Claude Desktop**:
+
+**macOS/Linux** (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
 ```json
 {
   "mcpServers": {
-    "ecommerce": {
-      "url": "http://localhost:8000/sse"
+    "enneagora": {
+      "command": "/path/to/enneagora/bin/enneagora.sh"
     }
   }
 }
 ```
 
-2. For a deployed server on Hugging Face Spaces:
+**Windows** (`%APPDATA%\Claude\claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
-    "ecommerce": {
-      "url": "https://SlavPilus.hf.space/enneagora/sse"
+    "enneagora": {
+      "command": "C:\\path\\to\\enneagora\\bin\\enneagora.bat"
     }
   }
 }
 ```
 
-3. Restart Claude Desktop to load the MCP tools.
+3. **Restart Claude Desktop** to load the MCP tools.
+
+**Note**: The launcher scripts in the `bin/` directory automatically use the correct Python environment and stdio transport.
 
 ## 🧪 Testing the Tools
 
@@ -111,11 +135,13 @@ Once connected to Claude Desktop, you can use natural language to interact with 
 ```ascii
 ┌─────────────────────────────────────┐
 │         MCP Clients                 │
-│  (Claude Desktop, Other Clients)    │
+│  (Claude Desktop, Web Clients)      │
 └──────────────┬──────────────────────┘
-               │ SSE Transport
+               │ SSE or STDIO Transport
 ┌──────────────▼──────────────────────┐
-│      FastMCP Server (main.py)       │
+│      FastMCP Server                 │
+│  • main.py (SSE for web/remote)     │
+│  • main_stdio.py (STDIO for Claude) │
 ├─────────────────────────────────────┤
 │  5 MCP Tools:                       │
 │  • get_order_status(order_id)       │
@@ -161,22 +187,32 @@ class ShopifyStrategy(BaseEcommerceStrategy):
 
 ### Deploy to Hugging Face Spaces
 
+The SSE version can be deployed to Hugging Face Spaces for remote access:
+
 1. Fork this repository
 2. Set up GitHub secrets:
    - `HF_TOKEN`: Your Hugging Face token
    - `HF_USERNAME`: Your Hugging Face username
    - `HF_SPACE_NAME`: Name for your Space
+   - `CODECOV_TOKEN`: (Optional) For code coverage reports
 3. Push to main branch to trigger deployment
+
+The deployed server will be available at:
+
+- Web UI: `https://SlavPilus/mpc-for-commerce-platforms.hf.space/`
+- SSE Endpoint: `https://SlavPilus/mpc-for-commerce-platforms.hf.space/sse`
 
 ### Manual Deployment
 
 ```bash
 # Build Docker image
-docker build -t enneagora
+docker build -t enneagora .
 
 # Run container
-docker run -p 8000:8000 enneagora
+docker run -p 7860:7860 enneagora
 ```
+
+**Note**: The Hugging Face deployment uses SSE transport and is accessible via HTTP. Claude Desktop cannot connect to remote SSE endpoints - use the local stdio version instead.
 
 ## 🧪 Development
 
@@ -200,14 +236,20 @@ mypy enneagora main.py
 
 ```text
 enneagora/
-├── main.py                 # FastMCP server entry point
+├── main.py                 # FastMCP server (SSE transport)
+├── main_stdio.py          # FastMCP server (STDIO transport for Claude Desktop)
+├── bin/                   # Launcher scripts
+│   ├── enneagora.sh       # Unix/macOS launcher
+│   ├── enneagora.bat      # Windows batch launcher
+│   └── enneagora.ps1      # Windows PowerShell launcher
 ├── mcp_server/            # Core server implementation
 │   ├── server.py          # Main server logic
-│   ├── nlp_processor.py   # NLP processing layer
 │   ├── models/            # Data models
 │   └── strategies/        # E-commerce platform strategies
 ├── tests/                 # Test suite
 ├── scripts/               # Utility scripts
+├── static/                # Web UI assets
+│   └── index.html         # Server info page
 └── requirements.txt       # Python dependencies
 ```
 
