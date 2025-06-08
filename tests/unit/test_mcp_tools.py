@@ -40,6 +40,15 @@ async def test_register_tools_returns_tool_dict(mock_mcp_instance):
         "process_return",
         "track_package",
         "get_support_info",
+        "get_return_policy",
+        "get_shipping_info",
+        "get_contact_information",
+        "get_size_guide",
+        "get_warranty_information",
+        "get_payment_information",
+        "get_account_help",
+        "get_loyalty_program_info",
+        "get_product_care_info",
     }
 
     assert isinstance(tools, dict)
@@ -55,8 +64,8 @@ async def test_register_tools_calls_mcp_tool_decorator(mock_mcp_instance):
     """Test that register_tools calls mcp.tool() for each tool."""
     register_tools(mock_mcp_instance)
 
-    # Verify that mcp.tool() was called 5 times (once for each tool)
-    assert mock_mcp_instance.tool.call_count == 5
+    # Verify that mcp.tool() was called 14 times (once for each tool)
+    assert mock_mcp_instance.tool.call_count == 14
 
 
 @pytest.mark.asyncio

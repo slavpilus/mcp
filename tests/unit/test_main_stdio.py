@@ -18,6 +18,15 @@ def test_tools_registration():
         "process_return",
         "track_package",
         "get_support_info",
+        "get_return_policy",
+        "get_shipping_info",
+        "get_contact_information",
+        "get_size_guide",
+        "get_warranty_information",
+        "get_payment_information",
+        "get_account_help",
+        "get_loyalty_program_info",
+        "get_product_care_info",
     }
     assert set(main_stdio.tools.keys()) == expected_tools
 

@@ -285,6 +285,23 @@ We're here to help with orders, returns, and any questions!"""
 • Returns and refunds
 • Shipping information
 • Contact information
+• Size guides for clothing and shoes
+• Warranty information
+• Payment methods and billing
+• Account and login help
+• Loyalty program details
+• Product care instructions
+
+For detailed information on any topic, please use the specific support tools available:
+• get_return_policy - Detailed return policies by category
+• get_shipping_info - Shipping rates and delivery options
+• get_contact_information - Contact details by issue type and urgency
+• get_size_guide - Size charts for clothing, shoes, and accessories
+• get_warranty_information - Warranty coverage and claims
+• get_payment_information - Payment methods and billing help
+• get_account_help - Account and login troubleshooting
+• get_loyalty_program_info - Rewards program information
+• get_product_care_info - Care instructions and maintenance tips
 
 Please let me know what you need help with!"""
 
