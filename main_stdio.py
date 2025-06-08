@@ -26,7 +26,7 @@ mcp = FastMCP("Enneagora - E-commerce MCP Server")
 
 
 @mcp.tool()
-def get_order_status(order_id: str, customer_id: str = "default") -> str:
+async def get_order_status(order_id: str, customer_id: str = "default") -> str:
     """
     Get status for a specific order.
 
@@ -37,11 +37,11 @@ def get_order_status(order_id: str, customer_id: str = "default") -> str:
     Returns:
         Formatted order status information including tracking details if shipped
     """
-    return ecommerce_server.get_order_status(order_id, customer_id)
+    return await ecommerce_server.get_order_status(order_id, customer_id)
 
 
 @mcp.tool()
-def cancel_order(
+async def cancel_order(
     order_id: str, reason: str = "Customer requested", customer_id: str = "default"
 ) -> str:
     """
@@ -55,11 +55,11 @@ def cancel_order(
     Returns:
         Cancellation confirmation or error message
     """
-    return ecommerce_server.cancel_order(order_id, reason, customer_id)
+    return await ecommerce_server.cancel_order(order_id, reason, customer_id)
 
 
 @mcp.tool()
-def process_return(
+async def process_return(
     order_id: str,
     item_ids: list[str] | None = None,
     reason: str = "Customer return",
@@ -77,11 +77,13 @@ def process_return(
     Returns:
         Return instructions and confirmation with return ID
     """
-    return ecommerce_server.process_return(order_id, item_ids, reason, customer_id)
+    return await ecommerce_server.process_return(
+        order_id, item_ids, reason, customer_id
+    )
 
 
 @mcp.tool()
-def track_package(order_id: str, customer_id: str = "default") -> str:
+async def track_package(order_id: str, customer_id: str = "default") -> str:
     """
     Track package delivery status for an order.
 
@@ -92,11 +94,11 @@ def track_package(order_id: str, customer_id: str = "default") -> str:
     Returns:
         Detailed tracking information including carrier, status, and delivery estimate
     """
-    return ecommerce_server.track_package(order_id, "order", customer_id)
+    return await ecommerce_server.track_package(order_id, "order", customer_id)
 
 
 @mcp.tool()
-def get_support_info(topic: str = "general", customer_id: str = "default") -> str:
+async def get_support_info(topic: str = "general", customer_id: str = "default") -> str:
     """
     Get customer support information for a specific topic.
 
@@ -107,7 +109,7 @@ def get_support_info(topic: str = "general", customer_id: str = "default") -> st
     Returns:
         Relevant support information based on the topic
     """
-    return ecommerce_server.get_support_info(topic, customer_id)
+    return await ecommerce_server.get_support_info(topic, customer_id)
 
 
 if __name__ == "__main__":

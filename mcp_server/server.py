@@ -15,7 +15,9 @@ class EcommerceMCPServer:
         self.ecommerce_strategy = ecommerce_strategy or MockDataStrategy()
         logger.info("Enneagora MCP Server initialized with e-commerce strategy")
 
-    def get_order_status(self, order_id: str, customer_id: str = "default") -> str:
+    async def get_order_status(
+        self, order_id: str, customer_id: str = "default"
+    ) -> str:
         """
         Get status for a specific order.
 
@@ -28,7 +30,7 @@ class EcommerceMCPServer:
         """
         try:
             # Get order details
-            order = self._run_sync(self.ecommerce_strategy.get_order(order_id))
+            order = await self.ecommerce_strategy.get_order(order_id)
             if not order:
                 return f"Order {order_id} not found. Please check the order number and try again."
 
@@ -38,9 +40,7 @@ class EcommerceMCPServer:
             response += f"Total: ${order.total_amount:.2f}\n"
 
             if order.status == "shipped":
-                tracking = self._run_sync(
-                    self.ecommerce_strategy.get_order_tracking(order_id)
-                )
+                tracking = await self.ecommerce_strategy.get_order_tracking(order_id)
                 if tracking:
                     response += f"\nTracking Number: {tracking.tracking_number}\n"
                     response += f"Carrier: {tracking.carrier}\n"
@@ -54,7 +54,7 @@ class EcommerceMCPServer:
             logger.error(f"Error in get_order_status: {e}")
             return "I encountered an error while checking your order status. Please try again later."
 
-    def cancel_order(
+    async def cancel_order(
         self,
         order_id: str,
         reason: str = "Customer requested",
@@ -73,7 +73,7 @@ class EcommerceMCPServer:
         """
         try:
             # Get order details
-            order = self._run_sync(self.ecommerce_strategy.get_order(order_id))
+            order = await self.ecommerce_strategy.get_order(order_id)
             if not order:
                 return f"Order {order_id} not found. Please check the order number and try again."
 
@@ -85,9 +85,7 @@ class EcommerceMCPServer:
                 return f"Order {order_id} has already shipped. Please use our return process instead."
 
             # Attempt cancellation
-            success = self._run_sync(
-                self.ecommerce_strategy.cancel_order(order_id, reason)
-            )
+            success = await self.ecommerce_strategy.cancel_order(order_id, reason)
 
             if success:
                 return f"Order {order_id} has been successfully cancelled. You will receive a confirmation email shortly, and any charges will be refunded within 3-5 business days."
@@ -98,7 +96,7 @@ class EcommerceMCPServer:
             logger.error(f"Error in cancel_order: {e}")
             return "I encountered an error while processing your cancellation. Please try again later."
 
-    def process_return(
+    async def process_return(
         self,
         order_id: str,
         item_ids: list[str] | None = None,
@@ -119,7 +117,7 @@ class EcommerceMCPServer:
         """
         try:
             # Get order details
-            order = self._run_sync(self.ecommerce_strategy.get_order(order_id))
+            order = await self.ecommerce_strategy.get_order(order_id)
             if not order:
                 return f"Order {order_id} not found. Please check the order number and try again."
 
@@ -132,8 +130,8 @@ class EcommerceMCPServer:
                 item_ids = [entry.product_id for entry in order.entries]
 
             # Process return
-            return_info = self._run_sync(
-                self.ecommerce_strategy.initiate_return(order_id, item_ids, reason)
+            return_info = await self.ecommerce_strategy.initiate_return(
+                order_id, item_ids, reason
             )
 
             if return_info:
@@ -157,7 +155,7 @@ class EcommerceMCPServer:
             logger.error(f"Error in process_return: {e}")
             return "I encountered an error while processing your return. Please try again later."
 
-    def track_package(
+    async def track_package(
         self,
         identifier: str,
         identifier_type: str = "order",
@@ -177,9 +175,7 @@ class EcommerceMCPServer:
         try:
             # Get tracking information
             if identifier_type == "order":
-                tracking = self._run_sync(
-                    self.ecommerce_strategy.get_order_tracking(identifier)
-                )
+                tracking = await self.ecommerce_strategy.get_order_tracking(identifier)
                 if not tracking:
                     return f"No tracking information found for order {identifier}."
             else:
@@ -205,7 +201,7 @@ class EcommerceMCPServer:
             logger.error(f"Error in track_package: {e}")
             return "I encountered an error while tracking your package. Please try again later."
 
-    def get_support_info(
+    async def get_support_info(
         self, topic: str = "general", customer_id: str = "default"
     ) -> str:
         """
@@ -222,9 +218,7 @@ class EcommerceMCPServer:
             topic_lower = topic.lower()
 
             if "return" in topic_lower or "refund" in topic_lower:
-                policy_info = self._run_sync(
-                    self.ecommerce_strategy.get_return_policy()
-                )
+                policy_info = await self.ecommerce_strategy.get_return_policy()
                 return f"Return Policy:\n{policy_info}\n\nTo process a return, provide your order number."
 
             elif "shipping" in topic_lower or "delivery" in topic_lower:
@@ -261,9 +255,31 @@ Please let me know what you need help with!"""
         """Run async coroutine synchronously."""
         import asyncio
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
         try:
-            return loop.run_until_complete(coro)
-        finally:
-            loop.close()
+            # Try to get the current event loop
+            loop = asyncio.get_running_loop()
+            # If we're in an async context, we can't use run_until_complete
+            # Instead, we need to handle this differently
+            import concurrent.futures
+
+            # Run the coroutine in a separate thread with its own event loop
+            def run_in_thread() -> Any:
+                new_loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(new_loop)
+                try:
+                    return new_loop.run_until_complete(coro)
+                finally:
+                    new_loop.close()
+
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(run_in_thread)
+                return future.result()
+
+        except RuntimeError:
+            # No event loop running, we can create one
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                return loop.run_until_complete(coro)
+            finally:
+                loop.close()

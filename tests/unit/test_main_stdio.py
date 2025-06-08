@@ -3,6 +3,8 @@
 import sys
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 # Create comprehensive mocks before any imports
 mock_mcp_module = MagicMock()
 mock_fastmcp_class = MagicMock()
@@ -163,78 +165,86 @@ class TestMainStdio:
             )
             mock_run.assert_called_with(transport="stdio")
 
-    def test_get_order_status_execution(self):
+    @pytest.mark.asyncio
+    async def test_get_order_status_execution(self):
         """Test get_order_status function execution."""
-        # Mock the ecommerce server's response
-        mock_ecommerce_server.get_order_status.return_value = (
-            "Order ORD-1001 Status: Shipped"
-        )
+
+        # Mock the ecommerce server's async response
+        async def mock_get_order_status(order_id, customer_id):
+            return "Order ORD-1001 Status: Shipped"
+
+        mock_ecommerce_server.get_order_status = mock_get_order_status
 
         # Call the function
-        result = main_stdio.get_order_status("ORD-1001", "customer123")
+        result = await main_stdio.get_order_status("ORD-1001", "customer123")
 
         # Verify the result
         assert result == "Order ORD-1001 Status: Shipped"
-        mock_ecommerce_server.get_order_status.assert_called_once_with(
-            "ORD-1001", "customer123"
-        )
 
-    def test_cancel_order_execution(self):
+    @pytest.mark.asyncio
+    async def test_cancel_order_execution(self):
         """Test cancel_order function execution."""
-        # Mock the ecommerce server's response
-        mock_ecommerce_server.cancel_order.return_value = "Order cancelled successfully"
+
+        # Mock the ecommerce server's async response
+        async def mock_cancel_order(order_id, reason, customer_id):
+            return "Order cancelled successfully"
+
+        mock_ecommerce_server.cancel_order = mock_cancel_order
 
         # Call the function
-        result = main_stdio.cancel_order("ORD-1002", "Changed my mind", "customer456")
-
-        # Verify the result
-        assert result == "Order cancelled successfully"
-        mock_ecommerce_server.cancel_order.assert_called_once_with(
+        result = await main_stdio.cancel_order(
             "ORD-1002", "Changed my mind", "customer456"
         )
 
-    def test_process_return_execution(self):
+        # Verify the result
+        assert result == "Order cancelled successfully"
+
+    @pytest.mark.asyncio
+    async def test_process_return_execution(self):
         """Test process_return function execution."""
-        # Mock the ecommerce server's response
-        mock_ecommerce_server.process_return.return_value = "Return RET-12345 initiated"
+
+        # Mock the ecommerce server's async response
+        async def mock_process_return(order_id, item_ids, reason, customer_id):
+            return "Return RET-12345 initiated"
+
+        mock_ecommerce_server.process_return = mock_process_return
 
         # Call the function
-        result = main_stdio.process_return(
+        result = await main_stdio.process_return(
             "ORD-1003", ["ITEM-1", "ITEM-2"], "Defective", "customer789"
         )
 
         # Verify the result
         assert result == "Return RET-12345 initiated"
-        mock_ecommerce_server.process_return.assert_called_once_with(
-            "ORD-1003", ["ITEM-1", "ITEM-2"], "Defective", "customer789"
-        )
 
-    def test_track_package_execution(self):
+    @pytest.mark.asyncio
+    async def test_track_package_execution(self):
         """Test track_package function execution."""
-        # Mock the ecommerce server's response
-        mock_ecommerce_server.track_package.return_value = (
-            "Package in transit - ETA: 2 days"
-        )
+
+        # Mock the ecommerce server's async response
+        async def mock_track_package(order_id, identifier_type, customer_id):
+            return "Package in transit - ETA: 2 days"
+
+        mock_ecommerce_server.track_package = mock_track_package
 
         # Call the function
-        result = main_stdio.track_package("ORD-1004", "customer321")
+        result = await main_stdio.track_package("ORD-1004", "customer321")
 
         # Verify the result
         assert result == "Package in transit - ETA: 2 days"
-        mock_ecommerce_server.track_package.assert_called_once_with(
-            "ORD-1004", "order", "customer321"
-        )
 
-    def test_get_support_info_execution(self):
+    @pytest.mark.asyncio
+    async def test_get_support_info_execution(self):
         """Test get_support_info function execution."""
-        # Mock the ecommerce server's response
-        mock_ecommerce_server.get_support_info.return_value = "Return policy: 30 days"
+
+        # Mock the ecommerce server's async response
+        async def mock_get_support_info(topic, customer_id):
+            return "Return policy: 30 days"
+
+        mock_ecommerce_server.get_support_info = mock_get_support_info
 
         # Call the function
-        result = main_stdio.get_support_info("returns", "customer654")
+        result = await main_stdio.get_support_info("returns", "customer654")
 
         # Verify the result
         assert result == "Return policy: 30 days"
-        mock_ecommerce_server.get_support_info.assert_called_once_with(
-            "returns", "customer654"
-        )

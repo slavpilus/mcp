@@ -1,6 +1,8 @@
 from datetime import datetime
 from unittest.mock import patch
 
+import pytest
+
 from mcp_server.server import EcommerceMCPServer
 from mcp_server.strategies.base import Address, Order, OrderEntry, TrackingInfo
 from mcp_server.strategies.mock_strategy import MockDataStrategy
@@ -18,37 +20,40 @@ def test_server_initialization():
     assert server.ecommerce_strategy is custom_strategy
 
 
-def test_get_order_status():
+@pytest.mark.asyncio
+async def test_get_order_status():
     """Test get_order_status with structured parameters."""
     server = EcommerceMCPServer()
 
     # Test with valid order ID
-    response = server.get_order_status("ORD-1001")
+    response = await server.get_order_status("ORD-1001")
     assert "ORD-1001" in response
     assert "Status:" in response
     assert "Order Date:" in response
     assert "Total: $" in response
 
     # Test with invalid order ID
-    response = server.get_order_status("INVALID-ID")
+    response = await server.get_order_status("INVALID-ID")
     assert "not found" in response
 
 
-def test_cancel_order():
+@pytest.mark.asyncio
+async def test_cancel_order():
     """Test cancel_order with structured parameters."""
     server = EcommerceMCPServer()
 
     # Test with valid order ID (should work if status is pending/processing)
-    response = server.cancel_order("ORD-1004", "Customer changed mind")
+    response = await server.cancel_order("ORD-1004", "Customer changed mind")
     # Response depends on order status in mock data
     assert "ORD-1004" in response
 
     # Test with invalid order ID
-    response = server.cancel_order("INVALID-ID")
+    response = await server.cancel_order("INVALID-ID")
     assert "not found" in response
 
 
-def test_process_return():
+@pytest.mark.asyncio
+async def test_process_return():
     """Test process_return with structured parameters."""
     server = EcommerceMCPServer()
 
@@ -61,15 +66,16 @@ def test_process_return():
 
     if delivered_order_id:
         # Test return for delivered order
-        response = server.process_return(delivered_order_id)
+        response = await server.process_return(delivered_order_id)
         assert "Return initiated" in response or "cannot be returned" in response
 
     # Test with invalid order ID
-    response = server.process_return("INVALID-ID")
+    response = await server.process_return("INVALID-ID")
     assert "not found" in response
 
 
-def test_track_package():
+@pytest.mark.asyncio
+async def test_track_package():
     """Test track_package with structured parameters."""
     server = EcommerceMCPServer()
 
@@ -82,36 +88,38 @@ def test_track_package():
 
     if shipped_order_id:
         # Test tracking for shipped order
-        response = server.track_package(shipped_order_id)
+        response = await server.track_package(shipped_order_id)
         assert "Package Tracking:" in response or "No tracking information" in response
 
     # Test with invalid order ID
-    response = server.track_package("INVALID-ID", "order")
+    response = await server.track_package("INVALID-ID", "order")
     assert "No tracking information" in response
 
 
-def test_get_support_info():
+@pytest.mark.asyncio
+async def test_get_support_info():
     """Test get_support_info with structured parameters."""
     server = EcommerceMCPServer()
 
     # Test general support info
-    response = server.get_support_info("general")
+    response = await server.get_support_info("general")
     assert "How can I help you" in response
 
     # Test returns topic
-    response = server.get_support_info("returns")
+    response = await server.get_support_info("returns")
     assert "Return Policy" in response
 
     # Test shipping topic
-    response = server.get_support_info("shipping")
+    response = await server.get_support_info("shipping")
     assert "Shipping Information" in response
 
     # Test contact topic
-    response = server.get_support_info("contact")
+    response = await server.get_support_info("contact")
     assert "Contact Information" in response
 
 
-def test_get_order_status_with_shipped_order():
+@pytest.mark.asyncio
+async def test_get_order_status_with_shipped_order():
     """Test get_order_status with a shipped order that has tracking."""
     server = EcommerceMCPServer()
 
@@ -166,7 +174,7 @@ def test_get_order_status_with_shipped_order():
         mock_get_order.return_value = shipped_order
         mock_get_tracking.return_value = tracking_info
 
-        response = server.get_order_status("ORD-SHIPPED")
+        response = await server.get_order_status("ORD-SHIPPED")
 
         assert "ORD-SHIPPED" in response
         assert "Shipped" in response
@@ -176,18 +184,20 @@ def test_get_order_status_with_shipped_order():
         assert "Estimated Delivery:" in response
 
 
-def test_get_order_status_exception_handling():
+@pytest.mark.asyncio
+async def test_get_order_status_exception_handling():
     """Test get_order_status exception handling."""
     server = EcommerceMCPServer()
 
     with patch.object(server.ecommerce_strategy, "get_order") as mock_get_order:
         mock_get_order.side_effect = Exception("Database error")
 
-        response = server.get_order_status("ORD-1001")
+        response = await server.get_order_status("ORD-1001")
         assert "encountered an error" in response
 
 
-def test_cancel_order_already_delivered():
+@pytest.mark.asyncio
+async def test_cancel_order_already_delivered():
     """Test canceling an already delivered order."""
     server = EcommerceMCPServer()
 
@@ -222,11 +232,12 @@ def test_cancel_order_already_delivered():
     with patch.object(server.ecommerce_strategy, "get_order") as mock_get_order:
         mock_get_order.return_value = delivered_order
 
-        response = server.cancel_order("ORD-DELIVERED")
+        response = await server.cancel_order("ORD-DELIVERED")
         assert "cannot be cancelled as it is already delivered" in response
 
 
-def test_cancel_order_already_shipped():
+@pytest.mark.asyncio
+async def test_cancel_order_already_shipped():
     """Test canceling an already shipped order."""
     server = EcommerceMCPServer()
 
@@ -261,11 +272,12 @@ def test_cancel_order_already_shipped():
     with patch.object(server.ecommerce_strategy, "get_order") as mock_get_order:
         mock_get_order.return_value = shipped_order
 
-        response = server.cancel_order("ORD-SHIPPED")
+        response = await server.cancel_order("ORD-SHIPPED")
         assert "has already shipped" in response
 
 
-def test_cancel_order_failure():
+@pytest.mark.asyncio
+async def test_cancel_order_failure():
     """Test cancel_order when cancellation fails."""
     server = EcommerceMCPServer()
 
@@ -305,22 +317,24 @@ def test_cancel_order_failure():
         mock_get_order.return_value = processing_order
         mock_cancel.return_value = False
 
-        response = server.cancel_order("ORD-PROCESSING")
+        response = await server.cancel_order("ORD-PROCESSING")
         assert "Unable to cancel order" in response
 
 
-def test_cancel_order_exception_handling():
+@pytest.mark.asyncio
+async def test_cancel_order_exception_handling():
     """Test cancel_order exception handling."""
     server = EcommerceMCPServer()
 
     with patch.object(server.ecommerce_strategy, "get_order") as mock_get_order:
         mock_get_order.side_effect = Exception("Database error")
 
-        response = server.cancel_order("ORD-1001")
+        response = await server.cancel_order("ORD-1001")
         assert "encountered an error" in response
 
 
-def test_process_return_ineligible_order():
+@pytest.mark.asyncio
+async def test_process_return_ineligible_order():
     """Test processing return for order that's not eligible."""
     server = EcommerceMCPServer()
 
@@ -355,11 +369,12 @@ def test_process_return_ineligible_order():
     with patch.object(server.ecommerce_strategy, "get_order") as mock_get_order:
         mock_get_order.return_value = processing_order
 
-        response = server.process_return("ORD-PROCESSING")
+        response = await server.process_return("ORD-PROCESSING")
         assert "cannot be returned yet" in response
 
 
-def test_process_return_failure():
+@pytest.mark.asyncio
+async def test_process_return_failure():
     """Test process_return when return initiation fails."""
     server = EcommerceMCPServer()
 
@@ -399,46 +414,50 @@ def test_process_return_failure():
         mock_get_order.return_value = delivered_order
         mock_return.return_value = None
 
-        response = server.process_return("ORD-DELIVERED")
+        response = await server.process_return("ORD-DELIVERED")
         assert "Unable to process return" in response
 
 
-def test_process_return_exception_handling():
+@pytest.mark.asyncio
+async def test_process_return_exception_handling():
     """Test process_return exception handling."""
     server = EcommerceMCPServer()
 
     with patch.object(server.ecommerce_strategy, "get_order") as mock_get_order:
         mock_get_order.side_effect = Exception("Database error")
 
-        response = server.process_return("ORD-1001")
+        response = await server.process_return("ORD-1001")
         assert "encountered an error" in response
 
 
-def test_track_package_by_tracking_number():
+@pytest.mark.asyncio
+async def test_track_package_by_tracking_number():
     """Test tracking by tracking number (not implemented)."""
     server = EcommerceMCPServer()
 
-    response = server.track_package("TRK123456789", "tracking")
+    response = await server.track_package("TRK123456789", "tracking")
     assert "not yet implemented" in response
 
 
-def test_track_package_exception_handling():
+@pytest.mark.asyncio
+async def test_track_package_exception_handling():
     """Test track_package exception handling."""
     server = EcommerceMCPServer()
 
     with patch.object(server.ecommerce_strategy, "get_order_tracking") as mock_tracking:
         mock_tracking.side_effect = Exception("Database error")
 
-        response = server.track_package("ORD-1001")
+        response = await server.track_package("ORD-1001")
         assert "encountered an error" in response
 
 
-def test_get_support_info_exception_handling():
+@pytest.mark.asyncio
+async def test_get_support_info_exception_handling():
     """Test get_support_info exception handling."""
     server = EcommerceMCPServer()
 
     with patch.object(server.ecommerce_strategy, "get_return_policy") as mock_policy:
         mock_policy.side_effect = Exception("Database error")
 
-        response = server.get_support_info("returns")
+        response = await server.get_support_info("returns")
         assert "encountered an error" in response

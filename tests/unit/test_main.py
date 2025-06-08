@@ -1,7 +1,9 @@
 """Test the main FastMCP server module."""
 
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 # Import the main module
 import main
@@ -49,23 +51,29 @@ def test_homepage_file_not_found():
         assert b"Enneagora - E-commerce MCP Server" in result.body
 
 
-def test_get_order_status():
+@pytest.mark.asyncio
+async def test_get_order_status():
     """Test get_order_status tool function."""
     with patch("main.ecommerce_server") as mock_server:
-        mock_server.get_order_status.return_value = "Order ORD-1001 is shipped"
+        mock_server.get_order_status = AsyncMock(
+            return_value="Order ORD-1001 is shipped"
+        )
 
-        result = main.get_order_status("ORD-1001", "CUST-100")
+        result = await main.get_order_status("ORD-1001", "CUST-100")
 
         mock_server.get_order_status.assert_called_once_with("ORD-1001", "CUST-100")
         assert result == "Order ORD-1001 is shipped"
 
 
-def test_cancel_order():
+@pytest.mark.asyncio
+async def test_cancel_order():
     """Test cancel_order tool function."""
     with patch("main.ecommerce_server") as mock_server:
-        mock_server.cancel_order.return_value = "Order ORD-1001 has been cancelled"
+        mock_server.cancel_order = AsyncMock(
+            return_value="Order ORD-1001 has been cancelled"
+        )
 
-        result = main.cancel_order("ORD-1001", "Customer requested", "CUST-100")
+        result = await main.cancel_order("ORD-1001", "Customer requested", "CUST-100")
 
         mock_server.cancel_order.assert_called_once_with(
             "ORD-1001", "Customer requested", "CUST-100"
@@ -73,12 +81,17 @@ def test_cancel_order():
         assert result == "Order ORD-1001 has been cancelled"
 
 
-def test_process_return():
+@pytest.mark.asyncio
+async def test_process_return():
     """Test process_return tool function."""
     with patch("main.ecommerce_server") as mock_server:
-        mock_server.process_return.return_value = "Return initiated with ID RET-001"
+        mock_server.process_return = AsyncMock(
+            return_value="Return initiated with ID RET-001"
+        )
 
-        result = main.process_return("ORD-1001", ["ITEM-1"], "Damaged", "CUST-100")
+        result = await main.process_return(
+            "ORD-1001", ["ITEM-1"], "Damaged", "CUST-100"
+        )
 
         mock_server.process_return.assert_called_once_with(
             "ORD-1001", ["ITEM-1"], "Damaged", "CUST-100"
@@ -86,12 +99,13 @@ def test_process_return():
         assert result == "Return initiated with ID RET-001"
 
 
-def test_track_package():
+@pytest.mark.asyncio
+async def test_track_package():
     """Test track_package tool function."""
     with patch("main.ecommerce_server") as mock_server:
-        mock_server.track_package.return_value = "Package is in transit"
+        mock_server.track_package = AsyncMock(return_value="Package is in transit")
 
-        result = main.track_package("ORD-1001", "CUST-100")
+        result = await main.track_package("ORD-1001", "CUST-100")
 
         mock_server.track_package.assert_called_once_with(
             "ORD-1001", "order", "CUST-100"
@@ -99,12 +113,15 @@ def test_track_package():
         assert result == "Package is in transit"
 
 
-def test_get_support_info():
+@pytest.mark.asyncio
+async def test_get_support_info():
     """Test get_support_info tool function."""
     with patch("main.ecommerce_server") as mock_server:
-        mock_server.get_support_info.return_value = "General support information"
+        mock_server.get_support_info = AsyncMock(
+            return_value="General support information"
+        )
 
-        result = main.get_support_info("general", "CUST-100")
+        result = await main.get_support_info("general", "CUST-100")
 
         mock_server.get_support_info.assert_called_once_with("general", "CUST-100")
         assert result == "General support information"
@@ -120,31 +137,32 @@ def test_mcp_server_initialization():
     assert main.mcp.name == "Enneagora - E-commerce MCP Server"
 
 
-def test_tool_functions_with_defaults():
+@pytest.mark.asyncio
+async def test_tool_functions_with_defaults():
     """Test tool functions with default parameters."""
     with patch("main.ecommerce_server") as mock_server:
-        mock_server.get_order_status.return_value = "Order status"
-        mock_server.cancel_order.return_value = "Order cancelled"
-        mock_server.process_return.return_value = "Return processed"
-        mock_server.track_package.return_value = "Package tracked"
-        mock_server.get_support_info.return_value = "Support info"
+        mock_server.get_order_status = AsyncMock(return_value="Order status")
+        mock_server.cancel_order = AsyncMock(return_value="Order cancelled")
+        mock_server.process_return = AsyncMock(return_value="Return processed")
+        mock_server.track_package = AsyncMock(return_value="Package tracked")
+        mock_server.get_support_info = AsyncMock(return_value="Support info")
 
         # Test with default parameters
-        main.get_order_status("ORD-1001")
+        await main.get_order_status("ORD-1001")
         mock_server.get_order_status.assert_called_with("ORD-1001", "default")
 
-        main.cancel_order("ORD-1001")
+        await main.cancel_order("ORD-1001")
         mock_server.cancel_order.assert_called_with(
             "ORD-1001", "Customer requested", "default"
         )
 
-        main.process_return("ORD-1001")
+        await main.process_return("ORD-1001")
         mock_server.process_return.assert_called_with(
             "ORD-1001", None, "Customer return", "default"
         )
 
-        main.track_package("ORD-1001")
+        await main.track_package("ORD-1001")
         mock_server.track_package.assert_called_with("ORD-1001", "order", "default")
 
-        main.get_support_info()
+        await main.get_support_info()
         mock_server.get_support_info.assert_called_with("general", "default")

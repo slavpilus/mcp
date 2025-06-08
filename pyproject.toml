@@ -67,6 +67,9 @@ addopts = [
 markers = [
     "integration: marks tests as integration tests (deselect with '-m \"not integration\"')"
 ]
+filterwarnings = [
+    "ignore::pytest.PytestConfigWarning"
+]
 
 [tool.coverage.run]
 source = ["mcp_server", "main", "main_stdio"]
