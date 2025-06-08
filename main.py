@@ -131,11 +131,12 @@ def get_support_info(topic: str = "general", customer_id: str = "default") -> st
 
 if __name__ == "__main__":
     # Configure server settings for Hugging Face Spaces
-    port = int(os.getenv("PORT", "8000"))
+    port = int(os.getenv("PORT", "7860"))  # HF Spaces default port is 7860
 
     # Update FastMCP settings directly
     mcp.settings.host = "0.0.0.0"
     mcp.settings.port = port
 
     logger.info(f"Starting Enneagora MCP Server on 0.0.0.0:{port}")
+    logger.info(f"PORT env var: {os.getenv('PORT', 'not set')}")
     mcp.run(transport="sse")
