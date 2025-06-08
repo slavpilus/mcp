@@ -9,7 +9,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: #333;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 2rem;
             background-color: #f5f5f5;
@@ -28,6 +28,10 @@
         h2 {
             color: #1f2937;
             margin-top: 2rem;
+        }
+        h3 {
+            color: #374151;
+            margin-top: 1.5rem;
         }
         .tool {
             background-color: #f3f4f6;
@@ -62,6 +66,40 @@
             font-size: 0.875rem;
             font-weight: 500;
         }
+        .integration-section {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .url-box {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .warning {
+            background-color: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .success {
+            background-color: #f0f9ff;
+            border: 1px solid #60a5fa;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
     </style>
 </head>
 <body>
@@ -69,7 +107,7 @@
         <h1>🛒 Enneagora - E-commerce MCP Server</h1>
         <p>
             <span class="status">Active</span>
-            Enneagora - MCP-compliant server for e-commerce customer support
+            Enneagora - Universal MCP-compliant server for e-commerce customer support with 14 comprehensive tools
         </p>
 
         <h2>📡 MCP Endpoint</h2>
@@ -77,70 +115,200 @@
         <pre><code>/sse</code></pre>
         <p><a href="/sse" target="_blank">Test SSE Endpoint</a> (should show SSE stream)</p>
 
-        <h2>🔧 Available Tools</h2>
+        <h2>🔗 Integration Methods</h2>
 
-        <div class="tool">
-            <h3>get_order_status</h3>
-            <p>Get status for a specific order</p>
-            <p><strong>Parameters:</strong></p>
-            <ul>
-                <li><code>order_id</code> (string) - The order identifier (e.g., "ORD-1001")</li>
-                <li><code>customer_id</code> (string, optional) - Customer identifier for validation</li>
-            </ul>
-        </div>
+        <div class="integration-section">
+            <h3>🖥️ Claude Desktop (Local Server)</h3>
+            <p>For Claude Desktop, you need to run the server locally and configure it for STDIO transport:</p>
 
-        <div class="tool">
-            <h3>cancel_order</h3>
-            <p>Cancel an order</p>
-            <p><strong>Parameters:</strong></p>
-            <ul>
-                <li><code>order_id</code> (string) - The order identifier to cancel</li>
-                <li><code>reason</code> (string, optional) - Reason for cancellation</li>
-                <li><code>customer_id</code> (string, optional) - Customer identifier for validation</li>
-            </ul>
-        </div>
+            <h4>Step 1: Clone and Setup</h4>
+            <pre><code>git clone https://github.com/slavpilus/mcp
+cd mcp
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt</code></pre>
 
-        <div class="tool">
-            <h3>process_return</h3>
-            <p>Process a return request for an order</p>
-            <p><strong>Parameters:</strong></p>
-            <ul>
-                <li><code>order_id</code> (string) - The order identifier to return</li>
-                <li><code>item_ids</code> (array, optional) - List of specific item IDs to return</li>
-                <li><code>reason</code> (string, optional) - Reason for return</li>
-                <li><code>customer_id</code> (string, optional) - Customer identifier for validation</li>
-            </ul>
-        </div>
+            <h4>Step 2: Configure Claude Desktop</h4>
+            <p><strong>macOS:</strong> Edit <code>~/Library/Application Support/Claude/claude_desktop_config.json</code></p>
+            <p><strong>Windows:</strong> Edit <code>%APPDATA%\Claude\claude_desktop_config.json</code></p>
 
-        <div class="tool">
-            <h3>track_package</h3>
-            <p>Track package delivery status for an order</p>
-            <p><strong>Parameters:</strong></p>
-            <ul>
-                <li><code>order_id</code> (string) - The order identifier to track</li>
-                <li><code>customer_id</code> (string, optional) - Customer identifier for validation</li>
-            </ul>
-        </div>
-
-        <div class="tool">
-            <h3>get_support_info</h3>
-            <p>Get customer support information for a specific topic</p>
-            <p><strong>Parameters:</strong></p>
-            <ul>
-                <li><code>topic</code> (string, optional) - Support topic: "returns", "shipping", "contact", or "general"</li>
-                <li><code>customer_id</code> (string, optional) - Customer identifier</li>
-            </ul>
-        </div>
-
-        <h2>🔗 Claude Desktop Integration</h2>
-        <p>To use this server with Claude Desktop, add it to your configuration:</p>
-        <pre><code>{
+            <pre><code>{
   "mcpServers": {
-    "ecommerce": {
-      "url": "http://localhost:8000/sse"
+    "enneagora": {
+      "command": "python",
+      "args": ["/full/path/to/mcp/main_stdio.py"],
+      "env": {}
     }
   }
 }</code></pre>
+
+            <div class="warning">
+                <p><strong>⚠️ Important:</strong> Use the full absolute path to <code>main_stdio.py</code> and ensure your Python environment has all dependencies installed.</p>
+            </div>
+
+            <h4>Step 3: Start Local Server</h4>
+            <p>The STDIO version will be automatically started by Claude Desktop. To test manually:</p>
+            <pre><code>python main_stdio.py</code></pre>
+        </div>
+
+        <div class="integration-section">
+            <h3>🌐 Remote SSE Integration</h3>
+            <p>For remote integration or web clients, use our hosted SSE endpoint:</p>
+
+            <div class="url-box">
+                <h4>🔗 Hosted SSE Endpoint</h4>
+                <p><strong>URL:</strong> <code>https://huggingface.co/spaces/SlavPilus/mpc-for-commerce-platforms/sse</code></p>
+                <p>This endpoint provides real-time access to all 14 e-commerce support tools via Server-Sent Events.</p>
+            </div>
+
+            <div class="success">
+                <p><strong>✅ Advantages:</strong> No local setup required, always up-to-date, scalable for multiple clients</p>
+                <p><strong>🔧 Use Cases:</strong> Web applications, MCP-compatible tools, API integrations</p>
+            </div>
+        </div>
+
+        <h2>🔧 Available Tools (14 Total)</h2>
+        <p>Enneagora provides comprehensive e-commerce support with these tools:</p>
+
+        <div class="tools-grid">
+            <div class="tool">
+                <h3>get_order_status</h3>
+                <p>Get detailed status for a specific order including tracking information</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>order_id</code> (string) - Order identifier (e.g., "ORD-1001")</li>
+                    <li><code>customer_id</code> (string, optional) - Customer validation</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>cancel_order</h3>
+                <p>Cancel an order with validation checks</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>order_id</code> (string) - Order to cancel</li>
+                    <li><code>reason</code> (string, optional) - Cancellation reason</li>
+                    <li><code>customer_id</code> (string, optional) - Customer validation</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>process_return</h3>
+                <p>Handle return requests with prepaid labels</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>order_id</code> (string) - Order to return</li>
+                    <li><code>item_ids</code> (array, optional) - Specific items</li>
+                    <li><code>reason</code> (string, optional) - Return reason</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>track_package</h3>
+                <p>Track package delivery with real-time updates</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>order_id</code> (string) - Order to track</li>
+                    <li><code>customer_id</code> (string, optional) - Customer validation</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>get_support_info</h3>
+                <p>General support information and guidance</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>topic</code> (string, optional) - Support topic</li>
+                    <li><code>customer_id</code> (string, optional) - Customer context</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>get_return_policy</h3>
+                <p>Detailed return policies by product category</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>product_category</code> (string, optional) - Category-specific policy</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>get_shipping_info</h3>
+                <p>Shipping rates, delivery times, and options</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>destination_country</code> (string, optional) - International rates</li>
+                    <li><code>order_value</code> (number, optional) - Free shipping check</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>get_contact_information</h3>
+                <p>Contact details by issue type and urgency</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>issue_type</code> (string, optional) - Type of issue</li>
+                    <li><code>urgency</code> (string, optional) - Urgency level</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>get_size_guide</h3>
+                <p>Size charts for clothing, shoes, and accessories</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>product_type</code> (string) - Product type</li>
+                    <li><code>brand</code> (string, optional) - Brand-specific sizing</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>get_warranty_information</h3>
+                <p>Warranty coverage and claims processing</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>product_category</code> (string) - Product category</li>
+                    <li><code>purchase_date</code> (string, optional) - Warranty status check</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>get_payment_information</h3>
+                <p>Payment methods, billing help, and troubleshooting</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>inquiry_type</code> (string, optional) - Payment inquiry type</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>get_account_help</h3>
+                <p>Account troubleshooting and login assistance</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>issue_type</code> (string) - Account issue type</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>get_loyalty_program_info</h3>
+                <p>Rewards program details and member benefits</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>inquiry_type</code> (string, optional) - Program inquiry type</li>
+                </ul>
+            </div>
+
+            <div class="tool">
+                <h3>get_product_care_info</h3>
+                <p>Care instructions and maintenance guidance</p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>product_category</code> (string) - Product category</li>
+                    <li><code>material</code> (string, optional) - Specific material</li>
+                </ul>
+            </div>
+        </div>
 
         <h2>🧪 Dynamic Testing Data</h2>
         <p>Enneagora features a dynamic mock data system where order behavior is determined by the order ID pattern. You can test various scenarios using these special order IDs:</p>
@@ -172,17 +340,50 @@
             </ul>
         </div>
 
-        <h2>📚 Example Usage</h2>
-        <p>Once connected, you can ask Claude:</p>
+        <h2>📚 Example Queries</h2>
+        <p>Once connected, you can ask Claude natural language questions that leverage all 14 tools:</p>
+
+        <h3>📦 Order Management</h3>
         <ul>
-            <li>"Check the status of order ORD-1001-S" (Shipped order)</li>
-            <li>"Cancel order ORD-1004-P" (Processing order - should work)</li>
-            <li>"Cancel order ORD-1002-D" (Delivered order - should fail)</li>
-            <li>"Track order ORD-1003-T" (In transit with location)</li>
-            <li>"Check order ORD-1005-R" (Ready for pickup)</li>
-            <li>"What happened to order ORD-1007-F?" (Failed order)</li>
-            <li>"Find order ORD-1008-E" (Error case)</li>
-            <li>"What's your return policy?"</li>
+            <li>"Check the status of order ORD-1001-S"</li>
+            <li>"Cancel order ORD-1004-P because I found a better price"</li>
+            <li>"I want to return my order ORD-1002-D, it didn't fit properly"</li>
+            <li>"Track my package for order ORD-1003-T"</li>
+            <li>"What happened to order ORD-1007-F? It shows as failed"</li>
+        </ul>
+
+        <h3>🛍️ Product & Shipping Information</h3>
+        <ul>
+            <li>"What's your return policy for electronics?"</li>
+            <li>"How much does shipping cost to Canada for a $45 order?"</li>
+            <li>"Do I qualify for free shipping on an $80 order?"</li>
+            <li>"What's the size guide for men's shirts?"</li>
+            <li>"Is my laptop still under warranty? I bought it on 2023-06-15"</li>
+        </ul>
+
+        <h3>💳 Payment & Account Support</h3>
+        <ul>
+            <li>"My credit card was declined, what should I do?"</li>
+            <li>"I forgot my password, how can I reset it?"</li>
+            <li>"What payment methods do you accept?"</li>
+            <li>"How does your loyalty program work?"</li>
+            <li>"I can't log into my account, can you help?"</li>
+        </ul>
+
+        <h3>🧽 Product Care & Maintenance</h3>
+        <ul>
+            <li>"How do I care for my silk dress?"</li>
+            <li>"What's the best way to clean leather shoes?"</li>
+            <li>"How should I store my wool sweater?"</li>
+            <li>"My cotton shirt has a stain, what should I do?"</li>
+        </ul>
+
+        <h3>☎️ Contact & Support</h3>
+        <ul>
+            <li>"I need to speak to someone about billing urgently"</li>
+            <li>"What's the best way to contact technical support?"</li>
+            <li>"I have a general question about returns"</li>
+            <li>"How can I reach corporate about a complaint?"</li>
         </ul>
 
         <h2>🎯 Testing Different Scenarios</h2>
@@ -208,8 +409,13 @@
             </ul>
         </div>
 
-        <h2>📖 Documentation</h2>
-        <p>For more information, visit the <a href="https://github.com/slavpilus/enneagora">GitHub repository</a>.</p>
+        <h2>📖 Documentation & Source Code</h2>
+        <p>
+            <strong>🔗 Repository:</strong> <a href="https://github.com/slavpilus/mcp" target="_blank">https://github.com/slavpilus/mcp</a><br>
+            <strong>📚 Documentation:</strong> Complete setup guides and API reference<br>
+            <strong>🐛 Issues:</strong> Report bugs and request features on GitHub<br>
+            <strong>🤝 Contributing:</strong> Contributions welcome! See the repository for guidelines
+        </p>
     </div>
 </body>
 </html>
