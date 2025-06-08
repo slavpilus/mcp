@@ -130,10 +130,12 @@ def get_support_info(topic: str = "general", customer_id: str = "default") -> st
 
 
 if __name__ == "__main__":
-    # Set environment variables for uvicorn (used by FastMCP internally)
-    port = os.getenv("PORT", "8000")
-    os.environ["UVICORN_PORT"] = port
-    os.environ["UVICORN_HOST"] = "0.0.0.0"
+    # Configure server settings for Hugging Face Spaces
+    port = int(os.getenv("PORT", "8000"))
 
-    logger.info(f"Starting Enneagora MCP Server on port {port}")
+    # Update FastMCP settings directly
+    mcp.settings.host = "0.0.0.0"
+    mcp.settings.port = port
+
+    logger.info(f"Starting Enneagora MCP Server on 0.0.0.0:{port}")
     mcp.run(transport="sse")
