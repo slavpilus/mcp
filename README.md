@@ -5,7 +5,7 @@ colorFrom: blue
 colorTo: purple
 sdk: gradio
 sdk_version: 5.33.0
-app_file: app.py
+app_file: main.py
 pinned: false
 license: mit
 tags: ["mcp", "commerce", "customer support" ]
