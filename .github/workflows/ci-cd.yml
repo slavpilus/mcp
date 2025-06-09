@@ -162,3 +162,32 @@ jobs:
 
           echo "✅ Deployed to Hugging Face Space!"
           echo "🌐 Visit: https://huggingface.co/spaces/${{ secrets.HF_USERNAME }}/${{ secrets.HF_SPACE_NAME }}"
+
+  deploy-to-hackathon:
+    name: Deploy to Hackathon Space
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push to Hackathon Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # Configure git for Hugging Face
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
+          # Add Hackathon Space remote
+          git remote add hackathon \
+            https://${{ secrets.HF_USERNAME }}:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Agents-MCP-Hackathon/Enneagora
+
+          # Push to Hackathon Space
+          git push --force hackathon main
+
+          echo "✅ Deployed to Hackathon Space!"
+          echo "🌐 Visit: https://huggingface.co/spaces/Agents-MCP-Hackathon/Enneagora"
