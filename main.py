@@ -674,17 +674,11 @@ def create_gradio_interface() -> gr.Blocks:
         # Display the hackathon submission content
         gr.HTML(value=html_content)
 
-        # Serve the demo GIF through Gradio Image component for proper file handling
-        import os
+        # Add JavaScript to suppress console errors and enforce light theme
+        # Note: Demo GIF now served from external URL to comply with HF restrictions
 
-        gif_path = os.path.join(os.path.dirname(__file__), "enneagora-demo.gif")
-        if os.path.exists(gif_path):
-            with gr.Row(visible=False):  # Hidden but serves the file
-                gr.Image(value=gif_path, label="Demo GIF", elem_id="demo-gif-component")
-
-            # Add JavaScript to update the HTML img src and suppress console errors
-            gr.HTML(
-                """
+        gr.HTML(
+            """
             <script>
             // Force light theme and hide theme toggles
             function forceLightTheme() {
@@ -756,20 +750,12 @@ def create_gradio_interface() -> gr.Blocks:
             };
 
             setTimeout(function() {
-                // Find the hidden image component and get its src
-                const hiddenImg = document.querySelector('#demo-gif-component img');
-                const demoImg = document.querySelector('#demo-gif');
-                if (hiddenImg && demoImg && hiddenImg.src) {
-                    // Update the data-src with the Gradio-served file URL
-                    demoImg.setAttribute('data-src', hiddenImg.src);
-                }
-
                 // Force light theme again after components load
                 forceLightTheme();
             }, 1000);
             </script>
             """
-            )
+        )
 
         # Hidden interfaces for MCP tool discovery (not visible to users)
         with gr.Tab("🔧 MCP Tools (Hidden)", visible=False):
@@ -838,17 +824,8 @@ def create_gradio_interface() -> gr.Blocks:
 if __name__ == "__main__":
     logger.info("Starting Enneagora - Gradio MCP Server")
 
-    # Ensure static files are available
+    # Set up static file serving
     import os
-    import shutil
-
-    gif_source = os.path.join(os.path.dirname(__file__), "enneagora-demo.gif")
-    gif_static = os.path.join(os.path.dirname(__file__), "static", "enneagora-demo.gif")
-
-    # Copy GIF to static directory if it doesn't exist there
-    if os.path.exists(gif_source) and not os.path.exists(gif_static):
-        shutil.copy2(gif_source, gif_static)
-        logger.info("Copied demo GIF to static directory")
 
     # Create and launch Gradio interface with MCP server
     demo = create_gradio_interface()
