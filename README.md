@@ -6,9 +6,13 @@ colorTo: purple
 sdk: gradio
 sdk_version: 5.33.0
 app_file: main.py
-pinned: false
+pinned: true
 license: mit
-tags: ["mcp", "commerce", "customer support", "mcp-server-track"]
+tags:
+- mcp-server-track
+- cuustomer support
+- commerce
+- e-commerce
 ---
 
 # Enneagora - E-commerce MCP Server
