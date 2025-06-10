@@ -91,8 +91,14 @@ def test_same_tools_as_main():
     import main
     import main_stdio
 
+    # Get the tool names from main (which has TOOLS list with function objects)
+    main_tool_names = {func.__name__ for func in main.TOOLS}
+
+    # Get the tool names from main_stdio (which has tools dict)
+    main_stdio_tool_names = set(main_stdio.tools.keys())
+
     # Both should have the same tool names
-    assert set(main.tools.keys()) == set(main_stdio.tools.keys())
+    assert main_tool_names == main_stdio_tool_names
 
     # Both should have the same number of tools
-    assert len(main.tools) == len(main_stdio.tools)
+    assert len(main.TOOLS) == len(main_stdio.tools)
