@@ -268,7 +268,7 @@
             </div>
             <p><strong>Track:</strong> MCP Tool/Server Track</p>
             <p><strong>Innovation Focus:</strong> First comprehensive e-commerce customer support MCP server with dynamic mock data and universal platform compatibility</p>
-            <p><strong>Technical Excellence:</strong> Type-safe implementation, comprehensive testing, dual transport support (SSE + STDIO), and production-ready deployment</p>
+            <p><strong>Technical Excellence:</strong> Type-safe implementation, comprehensive testing, dual MCP server support (Gradio + FastMCP), and production-ready deployment</p>
         </div>
 
         <h1>🛒 Enneagora - E-commerce MCP Server</h1>
@@ -281,10 +281,58 @@
             <h2>🎬 Live Demo & Video</h2>
             <p>Experience Enneagora in action through our live demonstration:</p>
 
-            <div class="video-placeholder">
-                <h3>📹 Demo Video Coming Soon</h3>
-                <p>Comprehensive walkthrough showing all 14 tools in action with Claude Desktop integration</p>
+            <div style="background: transparent; padding: 0; margin: 2rem 0;">
+                <h3 style="color: white; text-align: center; margin-bottom: 1rem;">🎬 Watch the Demo in Action</h3>
+                <div style="position: relative; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; backdrop-filter: blur(10px);">
+                    <img
+                        id="demo-gif"
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect width='800' height='450' fill='%23667eea'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='24' fill='white' text-anchor='middle' dominant-baseline='middle'%3ELoading demo...%3C/text%3E%3C/svg%3E"
+                        data-src="https://raw.githubusercontent.com/slavpilus/mcp/main/static/enneagora-demo.gif"
+                        alt="Enneagora Interactive Demo"
+                        loading="lazy"
+                        style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: block;"
+                        onload="if(this.getAttribute('data-src')) { this.src = this.getAttribute('data-src'); this.removeAttribute('data-src'); }"
+                    >
+                    <noscript>
+                        <img src="enneagora-demo.gif" alt="Enneagora Interactive Demo" style="width: 100%; height: auto; border-radius: 8px;">
+                    </noscript>
+                </div>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <p style="color: white; margin: 0.5rem 0;">Interactive demo showing all 14 MCP tools in action with real AI customer support</p>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin: 0.5rem 0;">
+                        Features: Live GPT-4 • Real-time tool execution • 4 customer scenarios • Natural conversations
+                    </p>
+                </div>
             </div>
+
+            <script>
+            // Lazy loading with Intersection Observer
+            document.addEventListener('DOMContentLoaded', function() {
+                const gif = document.getElementById('demo-gif');
+                if ('IntersectionObserver' in window) {
+                    const imageObserver = new IntersectionObserver((entries, observer) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                const img = entry.target;
+                                const src = img.getAttribute('data-src');
+                                if (src) {
+                                    img.src = src;
+                                    img.removeAttribute('data-src');
+                                    imageObserver.unobserve(img);
+                                }
+                            }
+                        });
+                    });
+                    imageObserver.observe(gif);
+                } else {
+                    // Fallback for browsers without Intersection Observer
+                    const src = gif.getAttribute('data-src');
+                    if (src) {
+                        gif.src = src;
+                    }
+                }
+            });
+            </script>
 
             <a href="https://huggingface.co/spaces/SlavPilus/mpc-for-commerce-platforms" class="cta-button" target="_blank">
                 🚀 Try Live Demo
@@ -316,10 +364,16 @@
             </div>
         </div>
 
-        <h2>📡 MCP Endpoint</h2>
-        <p>Connect to this server using the SSE transport:</p>
-        <pre><code>/sse</code></pre>
-        <p><a href="/sse" target="_blank">Test SSE Endpoint</a> (should show SSE stream)</p>
+        <h2>📡 MCP Server Information</h2>
+        <p>This Space runs a native Gradio MCP server with <code>mcp_server=True</code>, providing direct MCP protocol support for all compatible clients.</p>
+
+        <div class="success">
+            <h3>🎯 Gradio MCP Integration</h3>
+            <p><strong>Server Type:</strong> Native Gradio MCP Server</p>
+            <p><strong>Protocol:</strong> MCP (Model Context Protocol)</p>
+            <p><strong>Tools Available:</strong> 14 comprehensive e-commerce support tools</p>
+            <p><strong>Compatibility:</strong> All MCP-compatible clients and applications</p>
+        </div>
 
         <h2>🔗 Integration Methods</h2>
 
@@ -358,18 +412,36 @@ pip install -r requirements.txt</code></pre>
         </div>
 
         <div class="integration-section">
-            <h3>🌐 Remote SSE Integration</h3>
-            <p>For remote integration or web clients, use our hosted SSE endpoint:</p>
+            <h3>🎯 Gradio MCP Server Integration</h3>
+            <p>This Hugging Face Space provides a native Gradio MCP server implementation:</p>
 
             <div class="url-box">
-                <h4>🔗 Hosted SSE Endpoint</h4>
-                <p><strong>URL:</strong> <code>https://huggingface.co/spaces/SlavPilus/mpc-for-commerce-platforms/sse</code></p>
-                <p>This endpoint provides real-time access to all 14 e-commerce support tools via Server-Sent Events.</p>
+                <h4>🔗 Gradio MCP Server</h4>
+                <p><strong>Space URL:</strong> <code>https://huggingface.co/spaces/SlavPilus/mpc-for-commerce-platforms</code></p>
+                <p><strong>MCP SSE Endpoint:</strong> <code>https://huggingface.co/spaces/SlavPilus/mpc-for-commerce-platforms/gradio_api/mcp/sse</code></p>
+                <p><strong>Implementation:</strong> Native Gradio MCP server with <code>mcp_server=True</code></p>
+                <p>Direct MCP protocol access to all 14 e-commerce support tools.</p>
             </div>
 
             <div class="success">
-                <p><strong>✅ Advantages:</strong> No local setup required, always up-to-date, scalable for multiple clients</p>
-                <p><strong>🔧 Use Cases:</strong> Web applications, MCP-compatible tools, API integrations</p>
+                <p><strong>✅ Advantages:</strong> Native MCP integration, no local setup required, always up-to-date, perfect for MCP clients</p>
+                <p><strong>🔧 Use Cases:</strong> MCP-compatible applications, AI assistants, automated support systems</p>
+            </div>
+        </div>
+
+        <div class="integration-section">
+            <h3>🛠️ FastMCP Local Development</h3>
+            <p>For local development and traditional MCP transports, we also provide FastMCP implementations:</p>
+
+            <div class="warning">
+                <h4>🖥️ Local FastMCP Server</h4>
+                <p><strong>STDIO Transport:</strong> <code>python main_stdio.py</code> for Claude Desktop integration</p>
+                <p><strong>Local Gradio MCP:</strong> <code>python main.py</code> runs Gradio MCP server at <code>localhost:7860/gradio_api/mcp/sse</code></p>
+                <p>Use FastMCP for Claude Desktop integration, Gradio for web-based MCP clients.</p>
+            </div>
+
+            <div class="success">
+                <p><strong>✅ Use Cases:</strong> Local development, Claude Desktop integration, testing, custom deployments</p>
             </div>
         </div>
 
@@ -492,9 +564,9 @@ pip install -r requirements.txt</code></pre>
 
             <div class="feature-grid">
                 <div class="feature-card">
-                    <h3>🔄 Dual Transport Support</h3>
-                    <p><strong>SSE Transport:</strong> For web applications and remote clients<br>
-                    <strong>STDIO Transport:</strong> Optimized for Claude Desktop integration</p>
+                    <h3>🔄 Dual MCP Implementation</h3>
+                    <p><strong>Gradio MCP Server:</strong> Native implementation for Hugging Face Spaces<br>
+                    <strong>FastMCP Server:</strong> Traditional SSE/STDIO transports for local development</p>
                 </div>
                 <div class="feature-card">
                     <h3>🎯 Strategy Pattern</h3>

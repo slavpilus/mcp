@@ -8,7 +8,7 @@ sdk_version: 5.33.0
 app_file: main.py
 pinned: false
 license: mit
-tags: ["mcp", "commerce", "customer support" ]
+tags: ["mcp", "commerce", "customer support", "mcp-server-track"]
 ---
 
 # Enneagora - E-commerce MCP Server
@@ -17,7 +17,7 @@ Enneagora is a Universal E-commerce Customer Support Assistant using the Model C
 
 ## 🚀 Features
 
-- **MCP-Compliant**: True MCP server implementation using FastMCP with both SSE and STDIO transports
+- **MCP-Compliant**: Dual MCP server implementation using both Gradio and FastMCP with SSE and STDIO transports
 - **14 Comprehensive Customer Support Tools**:
   - **Order Management**: `get_order_status`, `cancel_order`, `process_return`, `track_package`
   - **Support Information**: `get_support_info`, `get_return_policy`, `get_shipping_info`, `get_contact_information`
@@ -25,7 +25,7 @@ Enneagora is a Universal E-commerce Customer Support Assistant using the Model C
   - **Account & Payment**: `get_payment_information`, `get_account_help`, `get_loyalty_program_info`
 - **Platform Agnostic**: Strategy pattern for easy integration with any e-commerce platform
 - **Dynamic Mock Data**: Intelligent test data system with pattern-based order behavior
-- **Dual Transport Support**: SSE for web/remote clients, STDIO for Claude Desktop
+- **Dual Implementation Support**: Gradio MCP server for web deployment, FastMCP for Claude Desktop STDIO integration
 - **Production Ready**: CI/CD pipeline with automated deployment to Hugging Face Spaces
 
 ## 📋 Prerequisites
@@ -58,29 +58,28 @@ pip install -r requirements.txt
 
 ## 🚀 Usage Options
 
-### Option 1: Remote SSE Integration (Recommended for Web Apps)
+### Option 1: Gradio MCP Server (Recommended for Hugging Face Spaces)
 
-Use the hosted Hugging Face Spaces endpoint for immediate access:
+Use the hosted Gradio MCP server on Hugging Face Spaces:
 
-**SSE Endpoint:** `https://huggingface.co/spaces/SlavPilus/mpc-for-commerce-platforms/sse`
+**Gradio MCP Endpoint:** `https://huggingface.co/spaces/SlavPilus/mpc-for-commerce-platforms`
 
 **Advantages:**
+- Native Gradio MCP server implementation with `mcp_server=True`
 - No local setup required
 - Always up-to-date with latest features
-- Scalable for multiple clients
-- Perfect for web applications and API integrations
+- Perfect for MCP-compatible clients and integrations
+- Seamless Hugging Face Spaces deployment
 
-### Option 2: Local Development & Claude Desktop
-
-#### Local SSE Server (for web/remote clients)
+#### Gradio MCP Server (local development)
 
 ```bash
 python main.py
 ```
 
-The server starts on `http://localhost:7860` with MCP endpoint at `http://localhost:7860/sse`.
+The Gradio MCP server starts on `http://localhost:7860` with MCP SSE endpoint at `http://localhost:7860/gradio_api/mcp/sse`.
 
-#### Claude Desktop Integration (STDIO)
+#### FastMCP Claude Desktop Integration (STDIO)
 
 **Step 1: Configure Claude Desktop**
 
@@ -181,11 +180,11 @@ Once connected to Claude Desktop or an MCP client, you can use natural language:
 │         MCP Clients                 │
 │  (Claude Desktop, Web Clients)      │
 └──────────────┬──────────────────────┘
-               │ SSE or STDIO Transport
+               │ MCP Protocol Transport
 ┌──────────────▼──────────────────────┐
-│      FastMCP Server                 │
-│  • main.py (SSE for web/remote)     │
-│  • main_stdio.py (STDIO for Claude) │
+│      Dual MCP Implementation        │
+│  • main.py (Gradio MCP Server)      │
+│  • main_stdio.py (FastMCP STDIO)    │
 ├─────────────────────────────────────┤
 │  14 MCP Tools:                      │
 │  • Order Management (4 tools)       │
@@ -247,7 +246,8 @@ pre-commit run --all-files
 
 ```text
 mcp/
-├── main.py                 # FastMCP server (SSE transport)
+├── main.py                 # Gradio MCP server (mcp_server=True)
+├── app.py                  # MCP tools for Gradio registration
 ├── main_stdio.py          # FastMCP server (STDIO transport for Claude Desktop)
 ├── mcp_server/            # Core server implementation
 │   ├── server.py          # Main server logic
