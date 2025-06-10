@@ -394,12 +394,18 @@ def create_gradio_interface() -> gr.Blocks:
             src: local('system-ui'), local('-apple-system'), local('BlinkMacSystemFont');
         }
 
-        /* Reset and base styles */
+        /* Reset and base styles - Mobile first */
         .gradio-container {
             max-width: 1200px !important;
             margin: 0 auto !important;
-            padding: 0 !important;
+            padding: 0.5rem !important;
             background: white !important;
+        }
+
+        @media (min-width: 768px) {
+            .gradio-container {
+                padding: 0 !important;
+            }
         }
 
         body {

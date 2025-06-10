@@ -11,70 +11,146 @@
             color: #333;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1rem;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
+
+        /* Mobile-first responsive design */
+        @media (min-width: 768px) {
+            body {
+                padding: 2rem;
+            }
+        }
         .container {
             background-color: white;
-            padding: 2.5rem;
+            padding: 1.5rem;
             border-radius: 12px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             margin-bottom: 2rem;
         }
+
+        @media (min-width: 768px) {
+            .container {
+                padding: 2.5rem;
+            }
+        }
         .hackathon-header {
             background: linear-gradient(135deg, #FF6B6B, #FF8E53);
             color: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 12px;
             margin-bottom: 2rem;
             text-align: center;
         }
+
+        @media (min-width: 768px) {
+            .hackathon-header {
+                padding: 2rem;
+            }
+        }
+
         .hackathon-header h1 {
             margin: 0 0 0.5rem 0;
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
         }
+
+        @media (min-width: 768px) {
+            .hackathon-header h1 {
+                font-size: 2.5rem;
+            }
+        }
         .hackathon-header .subtitle {
-            font-size: 1.2rem;
+            font-size: 1rem;
             opacity: 0.9;
             margin: 0;
         }
+
+        @media (min-width: 768px) {
+            .hackathon-header .subtitle {
+                font-size: 1.2rem;
+            }
+        }
+
         .badges {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             margin: 1.5rem 0;
             flex-wrap: wrap;
             justify-content: center;
         }
+
+        @media (min-width: 768px) {
+            .badges {
+                gap: 1rem;
+            }
+        }
         .badge {
             background: rgba(255,255,255,0.2);
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 20px;
             font-weight: 500;
             backdrop-filter: blur(10px);
+            font-size: 0.85rem;
+        }
+
+        @media (min-width: 768px) {
+            .badge {
+                padding: 0.5rem 1rem;
+                font-size: 1rem;
+            }
         }
         h1 {
             color: #2563eb;
             border-bottom: 2px solid #e5e7eb;
             padding-bottom: 0.5rem;
+            font-size: 1.6rem;
         }
+
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
         h2 {
             color: #1f2937;
-            margin-top: 2.5rem;
-            font-size: 1.8rem;
+            margin-top: 2rem;
+            font-size: 1.4rem;
         }
+
+        @media (min-width: 768px) {
+            h2 {
+                margin-top: 2.5rem;
+                font-size: 1.8rem;
+            }
+        }
+
         h3 {
             color: #374151;
             margin-top: 1.5rem;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
+        }
+
+        @media (min-width: 768px) {
+            h3 {
+                font-size: 1.3rem;
+            }
         }
         .highlight-section {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 12px;
-            margin: 2rem 0;
+            margin: 1.5rem 0;
+        }
+
+        @media (min-width: 768px) {
+            .highlight-section {
+                padding: 2rem;
+                margin: 2rem 0;
+            }
         }
         .highlight-section h2 {
             color: white;
@@ -129,9 +205,16 @@
         }
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: 1fr;
+            gap: 1rem;
             margin: 1.5rem 0;
+        }
+
+        @media (min-width: 768px) {
+            .tools-grid {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 1.5rem;
+            }
         }
         .url-box {
             background: linear-gradient(135deg, #fef3c7, #fcd34d);
@@ -167,9 +250,16 @@
         }
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: 1fr;
+            gap: 1rem;
             margin: 1.5rem 0;
+        }
+
+        @media (min-width: 768px) {
+            .feature-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+            }
         }
         .feature-card {
             background: white;
@@ -183,9 +273,16 @@
         }
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
             margin: 1.5rem 0;
+        }
+
+        @media (min-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 1rem;
+            }
         }
         .stat {
             text-align: center;
@@ -201,24 +298,45 @@
         .demo-section {
             background: linear-gradient(135deg, #FF6B6B, #FF8E53);
             color: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 12px;
-            margin: 2rem 0;
+            margin: 1.5rem 0;
         }
+
+        @media (min-width: 768px) {
+            .demo-section {
+                padding: 2rem;
+                margin: 2rem 0;
+            }
+        }
+
         .demo-section h2 {
             color: white;
             margin-top: 0;
         }
+
         .cta-button {
             display: inline-block;
             background: white;
             color: #2563eb;
-            padding: 1rem 2rem;
+            padding: 0.8rem 1.5rem;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            margin: 1rem 0.5rem 0 0;
+            margin: 0.5rem 0.25rem;
             transition: transform 0.2s ease;
+            font-size: 0.9rem;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        @media (min-width: 768px) {
+            .cta-button {
+                padding: 1rem 2rem;
+                margin: 1rem 0.5rem 0 0;
+                font-size: 1rem;
+                min-width: auto;
+            }
         }
         .cta-button:hover {
             transform: translateY(-2px);
